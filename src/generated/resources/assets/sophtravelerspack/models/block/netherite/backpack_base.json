@@ -1,0 +1,7 @@
+{
+  "parent": "sophisticatedbackpacks:block/backpack_base",
+  "textures": {
+    "cloth": "sophtravelerspack:block/netherite/backpack_cloth",
+    "particle": "sophtravelerspack:block/netherite/backpack_cloth"
+  }
+}

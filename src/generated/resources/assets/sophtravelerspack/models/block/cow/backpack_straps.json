@@ -1,0 +1,7 @@
+{
+  "parent": "sophisticatedbackpacks:block/backpack_straps",
+  "textures": {
+    "cloth": "sophtravelerspack:block/cow/backpack_cloth",
+    "particle": "sophtravelerspack:block/cow/backpack_cloth"
+  }
+}

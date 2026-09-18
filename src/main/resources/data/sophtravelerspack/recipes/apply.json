@@ -1,0 +1,15 @@
+{
+  "type": "sophtravelerspack:apply_traveler_type",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "sophisticatedbackpacks:backpacks"
+    },
+    {
+      "tag": "travelersbackpack:backpacks"
+    }
+  ],
+  "result": {
+    "item": "sophisticatedbackpacks:backpack"
+  }
+}

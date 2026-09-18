@@ -1,0 +1,37 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.vomiter.sophtravelerspack.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "sophtravelerspack.mixins.refmap.json",
+  "mixins": [
+    "SophBackpackFluidHandlerAccessor",
+    "model.BackpackItemMixin",
+    "travelers.BackpackAbilitiesMixin",
+    "travelers.BackpackWrapperMixin",
+    "travelers.CapabilityUtilsMixin",
+    "travelers.NeoForgeEventHandlerMixin",
+    "travelers.SophBackpackItemStackMixin",
+    "travelers.block.BlockMixin",
+    "travelers.block.ForgeHooksMixin",
+    "travelers.block.SophisticatedBackpackBlockEntityMixin",
+    "travelers.hose.HoseItemMixin"
+  ],
+  "client": [
+    "SpriteResourceLoaderMixin",
+    "extra_model.BackpackBlockEntityRendererMixin",
+    "extra_model.ItemRendererMixin",
+    "extra_model.TravelerDynamicBackpackModelMixin",
+    "model.BackpackBakedModelMixin",
+    "model.BackpackDynamicModelLoaderAccessor",
+    "model.BackpackDynamicModelMixin",
+    "model.BackpackOverrideMixin",
+    "travelers.hose.ToolsScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

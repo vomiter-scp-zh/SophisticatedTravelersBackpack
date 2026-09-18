@@ -1,0 +1,7 @@
+{
+  "parent": "sophisticatedbackpacks:block/backpack_right_pouch",
+  "textures": {
+    "cloth": "sophtravelerspack:block/coal/backpack_cloth",
+    "particle": "sophtravelerspack:block/coal/backpack_cloth"
+  }
+}
