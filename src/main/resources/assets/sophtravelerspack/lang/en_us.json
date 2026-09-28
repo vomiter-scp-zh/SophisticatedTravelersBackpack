@@ -1,4 +1,5 @@
 {
   "itemGroup.sophtravelerspack": "Traveler's Sophisticated Backpacks",
-  "tooltip.sophtravelerspack.traveler_type": "Traveler's Type: %s"
+  "tooltip.sophtravelerspack.traveler_type": "Traveler's Type: %s",
+  "ability.sophtravelerspack.hold_ctrl": "Hold <Ctrl> for Special Ability Description"
 }

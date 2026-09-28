@@ -45,8 +45,11 @@ public final class ModTravelerTypeRegistry {
                             travelerType.getStringRepresentation(),
                             () -> new TravelerTypeInstance(
                                     travelerType.getStringRepresentation(),
-                                    travelerType::createItemStack
-                            )
+                                    travelerType::createItemStack,
+                                    ResourceLocation.fromNamespaceAndPath(
+                                    "travelersbackpack",
+                                    "block/backpack/" + travelerType.getStringRepresentation()
+                            ))
                     );
 
             MUTABLE_ENTRIES.put(travelerType, registryObject);

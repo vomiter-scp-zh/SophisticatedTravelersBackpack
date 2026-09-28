@@ -1,7 +1,9 @@
 package com.vomiter.sophtravelerspack.mixin;
 
 import com.mojang.logging.LogUtils;
+import com.vomiter.sophtravelerspack.common.registry.ModTravelerTypeRegistry;
 import com.vomiter.sophtravelerspack.traveler.TravelerType;
+import com.vomiter.sophtravelerspack.traveler.TravelerTypeInstance;
 import com.vomiter.sophtravelerspack.util.TravelerSophSpriteComposer;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.SpriteLoader;
@@ -65,10 +67,9 @@ public abstract class SpriteResourceLoaderMixin {
         List<Supplier<SpriteContents>> sprites =
                 new ArrayList<>(cir.getReturnValue());
 
-        for (TravelerType travelerType : TravelerType.values()) {
+        for (TravelerTypeInstance travelerType : ModTravelerTypeRegistry.REGISTRY.get()) {
             sprites.add(() -> sophtravelerspack$createBackpackCloth(
-                    resourceManager,
-                    travelerType
+                    resourceManager, travelerType
             ));
         }
 
@@ -79,17 +80,13 @@ public abstract class SpriteResourceLoaderMixin {
     @Nullable
     private static SpriteContents sophtravelerspack$createBackpackCloth(
             ResourceManager resourceManager,
-            TravelerType travelerType
+            TravelerTypeInstance travelerTypeInstance
     ) {
-        String textureName = travelerType.name().toLowerCase(Locale.ROOT);
         ResourceLocation generatedId = ResourceLocation.fromNamespaceAndPath(
                 "sophtravelerspack",
-                "block/" + textureName + "/backpack_cloth"
+                "block/" + travelerTypeInstance.getStringRepresentation() + "/backpack_cloth"
         );
-        ResourceLocation travelersTextureId = ResourceLocation.fromNamespaceAndPath(
-                "travelersbackpack",
-                "block/backpack/" + textureName
-        );
+        ResourceLocation travelersTextureId = travelerTypeInstance.getTextureId();
 
         SpriteContents sophisticatedBase = null;
         SpriteContents travelersTexture = null;
