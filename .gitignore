@@ -14257,3 +14257,5 @@
 /.gradle/
 /build/
 /src/.idea/
+/src/test/
+/src/generated/resources/.cache/
