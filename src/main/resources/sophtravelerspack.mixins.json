@@ -12,6 +12,7 @@
     "travelers.CapabilityUtilsMixin",
     "travelers.NeoForgeEventHandlerMixin",
     "travelers.SophBackpackItemStackMixin",
+    "travelers.ServerActionsSleepingBagMixin",
     "travelers.block.BlockMixin",
     "travelers.block.ForgeHooksMixin",
     "travelers.block.SophisticatedBackpackBlockEntityMixin",

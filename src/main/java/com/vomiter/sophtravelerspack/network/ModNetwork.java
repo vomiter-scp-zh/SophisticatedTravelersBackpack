@@ -1,6 +1,8 @@
 package com.vomiter.sophtravelerspack.network;
 
 import com.vomiter.sophtravelerspack.STBackpack;
+import com.vomiter.sophtravelerspack.util.SleepingBagUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -13,6 +15,8 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import net.p3pp3rf1y.sophisticatedbackpacks.api.CapabilityBackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackStorage;
 import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
+import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContainer;
+import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContext;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -43,6 +47,16 @@ public class ModNetwork {
                     .encoder(MenuMagazineTransferPacket::encode)
                     .decoder(MenuMagazineTransferPacket::decode)
                     .consumerMainThread(MenuMagazineTransferPacket::handle)
+                    .add();
+            CHANNEL.messageBuilder(EuipSBPSleepingBagRequest.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                    .encoder(EuipSBPSleepingBagRequest::encode)
+                    .decoder(EuipSBPSleepingBagRequest::decode)
+                    .consumerMainThread(EuipSBPSleepingBagRequest::handle)
+                    .add();
+            CHANNEL.messageBuilder(InWorldSBPSleepingBagRequest.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                    .encoder(InWorldSBPSleepingBagRequest::encode)
+                    .decoder(InWorldSBPSleepingBagRequest::decode)
+                    .consumerMainThread(InWorldSBPSleepingBagRequest::handle)
                     .add();
 
         });
@@ -135,6 +149,53 @@ public class ModNetwork {
 
         public static void handle(MenuMagazineTransferPacket packet, Supplier<NetworkEvent.Context> context) {
             var player = context.get().getSender();
+            context.get().setPacketHandled(true);
+        }
+    }
+
+    public record EuipSBPSleepingBagRequest(int containerId) {
+        public static void encode(EuipSBPSleepingBagRequest packet, FriendlyByteBuf buffer) {
+            buffer.writeVarInt(packet.containerId);
+        }
+
+        public static EuipSBPSleepingBagRequest decode(FriendlyByteBuf buffer) {
+            return new EuipSBPSleepingBagRequest(buffer.readVarInt());
+        }
+
+        public static void handle(EuipSBPSleepingBagRequest packet, Supplier<NetworkEvent.Context> context) {
+            var player = context.get().getSender();
+            if (player != null && player.containerMenu instanceof BackpackContainer menu
+                    && menu.containerId == packet.containerId && menu.stillValid(player)
+                    && menu.isFirstLevelStorage()
+                    && menu.getBackpackContext().getType() == BackpackContext.ContextType.ITEM_BACKPACK) {
+                SleepingBagUtils.useSleepingBagFromItem(player);
+            }
+            context.get().setPacketHandled(true);
+        }
+    }
+
+    public record InWorldSBPSleepingBagRequest(int containerId, BlockPos pos) {
+        public static void encode(InWorldSBPSleepingBagRequest packet, FriendlyByteBuf buffer) {
+            buffer.writeVarInt(packet.containerId);
+            buffer.writeBlockPos(packet.pos);
+        }
+
+        public static InWorldSBPSleepingBagRequest decode(FriendlyByteBuf buffer) {
+            return new InWorldSBPSleepingBagRequest(buffer.readVarInt(), buffer.readBlockPos());
+        }
+
+        public static void handle(InWorldSBPSleepingBagRequest packet, Supplier<NetworkEvent.Context> context) {
+            var player = context.get().getSender();
+            if (player != null && player.containerMenu instanceof BackpackContainer menu
+                    && menu.containerId == packet.containerId && menu.stillValid(player)
+                    && menu.isFirstLevelStorage() && menu.getBlockPosition().filter(packet.pos::equals).isPresent()
+                    && player.distanceToSqr(packet.pos.getX() + 0.5, packet.pos.getY() + 0.5, packet.pos.getZ() + 0.5) <= 64) {
+                if (SleepingBagUtils.isSleepingBagDeployed(menu.getStorageWrapper().getBackpack())) {
+                    SleepingBagUtils.recoverSleepingBagIntoSBP(player.level(), packet.pos);
+                } else {
+                    SleepingBagUtils.deploySleepingBagFromSBP(player.level(), packet.pos);
+                }
+            }
             context.get().setPacketHandled(true);
         }
     }

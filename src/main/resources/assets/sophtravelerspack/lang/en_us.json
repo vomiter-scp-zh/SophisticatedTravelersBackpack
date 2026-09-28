@@ -1,5 +1,9 @@
 {
   "itemGroup.sophtravelerspack": "Traveler's Sophisticated Backpacks",
   "tooltip.sophtravelerspack.traveler_type": "Traveler's Type: %s",
-  "ability.sophtravelerspack.hold_ctrl": "Hold <Ctrl> for Special Ability Description"
+  "ability.sophtravelerspack.hold_ctrl": "Hold <Ctrl> for Special Ability Description",
+  "gui.sophtravelerspack.sleeping_bag": "Sleeping bag",
+  "gui.sophtravelerspack.sleeping_bag.use": "Use sleeping bag",
+  "gui.sophtravelerspack.sleeping_bag.deploy": "Deploy sleeping bag",
+  "gui.sophtravelerspack.sleeping_bag.recover": "Recover sleeping bag"
 }

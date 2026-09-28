@@ -3,6 +3,7 @@ package com.vomiter.sophtravelerspack;
 import com.mojang.logging.LogUtils;
 import com.vomiter.sophtravelerspack.client.ClientEventHandler;
 import com.vomiter.sophtravelerspack.client.ClientUpgradeTabs;
+import com.vomiter.sophtravelerspack.client.SleepingBagScreenButton;
 import com.vomiter.sophtravelerspack.common.STBPCommand;
 import com.vomiter.sophtravelerspack.common.SleepingBagCommand;
 import com.vomiter.sophtravelerspack.common.registry.*;
@@ -47,6 +48,9 @@ public class STBackpack {
             modEventBus.addListener(ClientUpgradeTabs::onClientSetup);
             MinecraftForge.EVENT_BUS.addListener(ClientEventHandler::onClientTick);
             MinecraftForge.EVENT_BUS.addListener(ClientEventHandler::onItemTooltip);
+            MinecraftForge.EVENT_BUS.addListener(SleepingBagScreenButton::onInit);
+            MinecraftForge.EVENT_BUS.addListener(SleepingBagScreenButton::onRenderPre);
+            MinecraftForge.EVENT_BUS.addListener(SleepingBagScreenButton::onRenderPost);
         }
     }
 

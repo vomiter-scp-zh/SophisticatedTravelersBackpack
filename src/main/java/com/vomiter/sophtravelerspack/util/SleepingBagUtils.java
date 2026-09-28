@@ -1,6 +1,8 @@
 package com.vomiter.sophtravelerspack.util;
 
 import com.tiviacz.travelersbackpack.blocks.SleepingBagBlock;
+import com.tiviacz.travelersbackpack.common.ServerActions;
+import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -22,21 +24,42 @@ import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlock;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlockEntity;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.IBackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
+import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContainer;
 
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SleepingBagUtils {
-    //equipment route -> call com.tiviacz.travelersbackpack.common.ServerActions#toggleSleepingBag(player, pos, true, false)
-    //todo: mixin into placeAndUseSleepingBag to make sleeping bag in SBP usable
-
     final static String SLEEPING_BAG_DEPLOYED_KEY = "sleeping_bag_deployed";
     static void setSleepingBagDeployed(ItemStack stack, boolean b){
         var tag = stack.getOrCreateTag();
         tag.putBoolean(SLEEPING_BAG_DEPLOYED_KEY, b);
     }
-    static boolean isSleepingBagDeployed(ItemStack stack){
-        var tag = stack.getOrCreateTag();
-        return tag.getBoolean(SLEEPING_BAG_DEPLOYED_KEY);
+    public static boolean isSleepingBagDeployed(ItemStack stack){
+        return stack.hasTag() && stack.getTag().getBoolean(SLEEPING_BAG_DEPLOYED_KEY);
+    }
+
+    public static void useSleepingBagFromItem(Player player) {
+        if (!(player.containerMenu instanceof BackpackContainer menu) || menu.getBlockPosition().isPresent()) return;
+        if (getSleepingBag(menu.getStorageWrapper(), true).isEmpty()) return;
+        ServerActions.toggleSleepingBag(player, player.blockPosition(), true, false);
+    }
+
+    // Called by ServerActions' item/equipment route while the SBP menu is still open.
+    public static boolean placeAndUseSleepingBag(Player player, BlockPos foot, BlockPos head, BlockPos pos, Level level, Direction direction) {
+        if (!(player.containerMenu instanceof BackpackContainer menu) || menu.getBlockPosition().isPresent()) return false;
+        ItemStack bag = getSleepingBag(menu.getStorageWrapper(), true);
+        if (!(bag.getItem() instanceof BlockItem blockItem) || !(blockItem.getBlock() instanceof SleepingBagBlock)) return false;
+        if (!player.onGround() || level.getBlockState(foot.below()).isAir()
+                || level.getBlockState(foot.below()).getBlock() instanceof LiquidBlock || !BedBlock.canSetSpawn(level)
+                || !com.tiviacz.travelersbackpack.blockentity.BackpackBlockEntity.canPlaceSleepingBag(foot, level)
+                || !com.tiviacz.travelersbackpack.blockentity.BackpackBlockEntity.canPlaceSleepingBag(head, level)) return false;
+        BlockState state = blockItem.getBlock().defaultBlockState();
+        level.playSound(null, head, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.5F, 1.0F);
+        level.setBlock(foot, state.setValue(SleepingBagBlock.FACING, direction).setValue(SleepingBagBlock.PART, BedPart.FOOT).setValue(SleepingBagBlock.CAN_DROP, false), 3);
+        level.setBlock(head, state.setValue(SleepingBagBlock.FACING, direction).setValue(SleepingBagBlock.PART, BedPart.HEAD).setValue(SleepingBagBlock.CAN_DROP, false), 3);
+        level.updateNeighborsAt(pos, state.getBlock());
+        level.updateNeighborsAt(head, state.getBlock());
+        return true;
     }
 
     public static boolean deploySleepingBagFromSBP(Level level, BlockPos pos){
@@ -154,7 +177,13 @@ public class SleepingBagUtils {
     }
 
     public static boolean isThereSleepingBag(Level level, BlockPos pos, Direction direction, ItemStack backpack) {
-        if (level.getBlockState(pos.relative(direction)).getBlock() instanceof SleepingBagBlock && level.getBlockState(pos.relative(direction).relative(direction)).getBlock() instanceof SleepingBagBlock) {
+        BlockState foot = level.getBlockState(pos.relative(direction));
+        BlockState head = level.getBlockState(pos.relative(direction, 2));
+        if (foot.getBlock() instanceof SleepingBagBlock && head.is(foot.getBlock())
+                && foot.getValue(SleepingBagBlock.FACING) == direction
+                && head.getValue(SleepingBagBlock.FACING) == direction
+                && foot.getValue(SleepingBagBlock.PART) == BedPart.FOOT
+                && head.getValue(SleepingBagBlock.PART) == BedPart.HEAD) {
             return true;
         } else {
             setSleepingBagDeployed(backpack, false);
