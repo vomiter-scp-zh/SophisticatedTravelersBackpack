@@ -45,9 +45,15 @@ public class SleepingBagUtils {
             var wrapper = backpackBlockEntity.getBackpackWrapper();
             if (isThereSleepingBag(level, pos, backpackBlockEntity.getBlockState().getValue(BackpackBlock.FACING), wrapper.getBackpack())) return false;
             if (isSleepingBagDeployed(wrapper.getBackpack())) return false;
-            if (getSleepingBag(wrapper, true).isEmpty()) return false;
-            if (!deploySleepingBag(level, pos, ((BlockItem)getSleepingBag(wrapper, false).getItem()).getBlock())) return false;
+            ItemStack sleepingBag = getSleepingBag(wrapper, true);
+            if (sleepingBag.isEmpty()) return false;
+            if (!deploySleepingBag(level, pos, ((BlockItem) sleepingBag.getItem()).getBlock())) return false;
+            if (getSleepingBag(wrapper, false).isEmpty()) {
+                removeSleepingBag(level, pos, backpackBlockEntity.getBlockState().getValue(BackpackBlock.FACING));
+                return false;
+            }
             setSleepingBagDeployed(wrapper.getBackpack(), true);
+            backpackBlockEntity.setChanged();
             return true;
         }
         return false;
@@ -69,6 +75,7 @@ public class SleepingBagUtils {
             }
             removeSleepingBag(level, pos, direction);
             setSleepingBagDeployed(wrapper.getBackpack(), false);
+            backpackBlockEntity.setChanged();
             return true;
         }
         return false;
@@ -77,9 +84,9 @@ public class SleepingBagUtils {
     public static ItemStack getSleepingBag(IBackpackWrapper backpackWrapper, boolean simulate){
         var inv = backpackWrapper.getInventoryHandler();
         for (int i = 0; i < inv.getSlots(); i++) {
-            ItemStack stack = inv.extractItem(i, 1, simulate);
+            ItemStack stack = inv.getStackInSlot(i);
             if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof SleepingBagBlock){
-                return stack.copy();
+                return inv.extractItem(i, 1, simulate);
             }
         }
         return ItemStack.EMPTY;

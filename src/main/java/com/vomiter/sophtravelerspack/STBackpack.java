@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.vomiter.sophtravelerspack.client.ClientEventHandler;
 import com.vomiter.sophtravelerspack.client.ClientUpgradeTabs;
 import com.vomiter.sophtravelerspack.common.STBPCommand;
+import com.vomiter.sophtravelerspack.common.SleepingBagCommand;
 import com.vomiter.sophtravelerspack.common.registry.*;
 import com.vomiter.sophtravelerspack.network.ModNetwork;
 import com.vomiter.sophtravelerspack.traveler.EventHandler;
@@ -39,6 +40,7 @@ public class STBackpack {
         modEventBus.addListener(ModUpgradeContainers::register);
         modEventBus.addListener(ModNetwork::onCommonSetup);
         MinecraftForge.EVENT_BUS.addListener(STBPCommand::register);
+        MinecraftForge.EVENT_BUS.addListener(SleepingBagCommand::register);
         EventHandler.init();
 
         if (FMLEnvironment.dist.isClient()){
