@@ -2,9 +2,8 @@ package com.vomiter.sophtravelerspack.mixin;
 
 import com.mojang.logging.LogUtils;
 import com.vomiter.sophtravelerspack.common.registry.ModTravelerTypeRegistry;
-import com.vomiter.sophtravelerspack.traveler.TravelerType;
 import com.vomiter.sophtravelerspack.traveler.TravelerTypeInstance;
-import com.vomiter.sophtravelerspack.util.TravelerSophSpriteComposer;
+import com.vomiter.sophtravelerspack.client.sprite.TravelerSophSpriteComposer;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.SpriteLoader;
 import net.minecraft.client.renderer.texture.atlas.SpriteResourceLoader;

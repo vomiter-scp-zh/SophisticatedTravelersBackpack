@@ -1,4 +1,4 @@
-package com.vomiter.sophtravelerspack.util;
+package com.vomiter.sophtravelerspack.client.sprite;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.SpriteContents;

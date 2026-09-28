@@ -1,9 +1,9 @@
-package com.vomiter.sophtravelerspack.util;
+package com.vomiter.sophtravelerspack.client.sprite;
 
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.resources.ResourceLocation;
 
-import static com.vomiter.sophtravelerspack.util.BackpackTextureVertices.*;
+import static com.vomiter.sophtravelerspack.client.sprite.BackpackTextureVertices.*;
 
 /**
  * Builds a Sophisticated Backpack cloth sprite with the relevant portions of a

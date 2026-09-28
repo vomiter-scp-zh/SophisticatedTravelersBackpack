@@ -1,6 +1,6 @@
-package com.vomiter.sophtravelerspack.util;
+package com.vomiter.sophtravelerspack.client.sprite;
 
-import com.vomiter.sophtravelerspack.util.GeneratedSpriteUtil.Vertices;
+import com.vomiter.sophtravelerspack.client.sprite.GeneratedSpriteUtil.Vertices;
 
 public final class BackpackTextureVertices {
     private BackpackTextureVertices() {
