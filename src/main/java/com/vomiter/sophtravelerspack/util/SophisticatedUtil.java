@@ -4,6 +4,7 @@ import com.vomiter.sophtravelerspack.network.ModNetwork;
 import net.minecraft.Util;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.p3pp3rf1y.sophisticatedbackpacks.api.CapabilityBackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.IBackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
@@ -11,6 +12,8 @@ import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SophisticatedUtil {
+    private SophisticatedUtil(){}
+
     public static long lastRequestTime = -1;
 
     public static ItemStack getSophBackpackOnBack(Player player){

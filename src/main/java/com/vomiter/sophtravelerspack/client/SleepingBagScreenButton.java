@@ -8,12 +8,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.p3pp3rf1y.sophisticatedbackpacks.client.gui.BackpackScreen;
+import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlockEntity;
 import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContext;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.controls.Button;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.controls.ButtonDefinition;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.Dimension;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.GuiHelper;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.Position;
+import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 
 import java.util.Map;
 import java.util.List;
@@ -67,13 +69,16 @@ public final class SleepingBagScreenButton {
     private static void update(BackpackScreen screen, Button button) {
         var menu = screen.getMenu();
         var type = menu.getBackpackContext().getType();
+        boolean deployed = menu.getBlockPosition()
+                .flatMap(pos -> WorldHelper.getLoadedBlockEntity(screen.getMinecraft().level, pos, BackpackBlockEntity.class))
+                .map(blockEntity -> SleepingBagUtils.isSleepingBagDeployed(blockEntity.getBackpackWrapper().getBackpack()))
+                .orElseGet(() -> SleepingBagUtils.isSleepingBagDeployed(menu.getStorageWrapper().getBackpack()));
         boolean visible = menu.isFirstLevelStorage()
                 && (type == BackpackContext.ContextType.ITEM_BACKPACK || type == BackpackContext.ContextType.BLOCK_BACKPACK) &&
-                (SleepingBagUtils.isSleepingBagDeployed(menu.getStorageWrapper().getBackpack())
-                        || !SleepingBagUtils.getSleepingBag(menu.getStorageWrapper(), true).isEmpty());
+                (deployed || !SleepingBagUtils.getSleepingBag(menu.getStorageWrapper(), true).isEmpty());
         button.setVisible(visible);
         String action = type == BackpackContext.ContextType.ITEM_BACKPACK ? "use"
-                : SleepingBagUtils.isSleepingBagDeployed(menu.getStorageWrapper().getBackpack()) ? "recover" : "deploy";
+                : deployed ? "recover" : "deploy";
         button.setTooltip(List.of(Component.translatable("gui.sophtravelerspack.sleeping_bag." + action)));
         screen.getTransferToInventoryButtonPosition().ifPresent(position ->
                 button.setPosition(new Position(position.x() - 24, position.y())));

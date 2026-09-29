@@ -25,10 +25,13 @@ import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlockEntity;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.IBackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
 import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContainer;
+import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SleepingBagUtils {
+    private SleepingBagUtils(){}
+
     final static String SLEEPING_BAG_DEPLOYED_KEY = "sleeping_bag_deployed";
     static void setSleepingBagDeployed(ItemStack stack, boolean b){
         var tag = stack.getOrCreateTag();
@@ -77,6 +80,7 @@ public class SleepingBagUtils {
             }
             setSleepingBagDeployed(wrapper.getBackpack(), true);
             backpackBlockEntity.setChanged();
+            WorldHelper.notifyBlockUpdate(backpackBlockEntity);
             return true;
         }
         return false;
@@ -99,6 +103,7 @@ public class SleepingBagUtils {
             removeSleepingBag(level, pos, direction);
             setSleepingBagDeployed(wrapper.getBackpack(), false);
             backpackBlockEntity.setChanged();
+            WorldHelper.notifyBlockUpdate(backpackBlockEntity);
             return true;
         }
         return false;

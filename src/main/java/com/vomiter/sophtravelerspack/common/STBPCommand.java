@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.Locale;
 
 public final class STBPCommand {
+    private STBPCommand(){}
+
     private static final DynamicCommandExceptionType INVALID_CAMOUFLAGE =
             new DynamicCommandExceptionType(value ->
                     Component.literal("Unknown camouflage type: " + value));

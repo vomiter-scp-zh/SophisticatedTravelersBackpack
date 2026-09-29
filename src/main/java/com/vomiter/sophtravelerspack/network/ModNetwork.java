@@ -43,11 +43,6 @@ public class ModNetwork {
                     .decoder(MBPSyncResponse::decode)
                     .consumerMainThread(MBPSyncResponse::handle)
                     .add();
-            CHANNEL.messageBuilder(MenuMagazineTransferPacket.class, id++, NetworkDirection.PLAY_TO_SERVER)
-                    .encoder(MenuMagazineTransferPacket::encode)
-                    .decoder(MenuMagazineTransferPacket::decode)
-                    .consumerMainThread(MenuMagazineTransferPacket::handle)
-                    .add();
             CHANNEL.messageBuilder(EuipSBPSleepingBagRequest.class, id++, NetworkDirection.PLAY_TO_SERVER)
                     .encoder(EuipSBPSleepingBagRequest::encode)
                     .decoder(EuipSBPSleepingBagRequest::decode)
@@ -133,23 +128,6 @@ public class ModNetwork {
             );
 
             return result;
-        }
-    }
-
-    public static record MenuMagazineTransferPacket(int containerId, int slot, boolean unload) {
-        public static void encode(MenuMagazineTransferPacket packet, FriendlyByteBuf buffer) {
-            buffer.writeVarInt(packet.containerId);
-            buffer.writeVarInt(packet.slot);
-            buffer.writeBoolean(packet.unload);
-        }
-
-        public static MenuMagazineTransferPacket decode(FriendlyByteBuf buffer) {
-            return new MenuMagazineTransferPacket(buffer.readVarInt(), buffer.readVarInt(), buffer.readBoolean());
-        }
-
-        public static void handle(MenuMagazineTransferPacket packet, Supplier<NetworkEvent.Context> context) {
-            var player = context.get().getSender();
-            context.get().setPacketHandled(true);
         }
     }
 
