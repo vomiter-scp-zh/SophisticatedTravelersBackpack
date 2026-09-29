@@ -12,9 +12,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.event.RegisterCommandsEvent;
 
 public final class SleepingBagCommand {
-    private SleepingBagCommand() {
-    }
-
     public static void register(RegisterCommandsEvent event) {
         event.getDispatcher().register(
                 Commands.literal("sbp_sleeping_bag")
