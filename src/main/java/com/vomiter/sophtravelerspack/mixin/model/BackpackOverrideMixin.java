@@ -29,7 +29,7 @@ public class BackpackOverrideMixin {
     /*
     for item renderer. return the baked model built in BackpackBakedModelMixin#stbp$init
      */
-    @Inject(method = "resolve", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "resolve", at = @At("RETURN"), cancellable = true)
     private void stbp$resolve(
             BakedModel model,
             ItemStack stack,
