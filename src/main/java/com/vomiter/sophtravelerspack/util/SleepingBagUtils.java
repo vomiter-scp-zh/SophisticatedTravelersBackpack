@@ -2,6 +2,7 @@ package com.vomiter.sophtravelerspack.util;
 
 import com.tiviacz.travelersbackpack.blocks.SleepingBagBlock;
 import com.vomiter.sophtravelerspack.common.registry.ModDataComponents;
+import com.vomiter.sophtravelerspack.traveler.LegacyTravelerDataMigration;
 import com.tiviacz.travelersbackpack.common.ServerActions;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.core.BlockPos;
@@ -34,6 +35,7 @@ public class SleepingBagUtils {
     private SleepingBagUtils(){}
 
     static void setSleepingBagDeployed(ItemStack stack, boolean deployed) {
+        LegacyTravelerDataMigration.removeLegacyData(stack, LegacyTravelerDataMigration.SLEEPING_BAG_KEY);
         if (deployed) {
             stack.set(ModDataComponents.SLEEPING_BAG_DEPLOYED.get(), true);
         } else {
@@ -42,6 +44,7 @@ public class SleepingBagUtils {
     }
 
     public static boolean isSleepingBagDeployed(ItemStack stack) {
+        LegacyTravelerDataMigration.migrate(stack);
         return stack.getOrDefault(ModDataComponents.SLEEPING_BAG_DEPLOYED.get(), false);
     }
 

@@ -31,16 +31,22 @@ public final class TravelerUtil {
             );
         }
 
+        LegacyTravelerDataMigration.migrate(stack);
+        LegacyTravelerDataMigration.removeLegacyData(stack, LegacyTravelerDataMigration.TRAVELER_KEY);
         stack.set(ModDataComponents.TRAVELER_TYPE.get(), registryId);
         setShadow(stack, travelerType.createTravelerBackpack());
     }
 
     public static Optional<TravelerTypeInstance> get(ItemStack stack) {
+        LegacyTravelerDataMigration.migrate(stack);
         ResourceLocation registryId = stack.get(ModDataComponents.TRAVELER_TYPE.get());
         return registryId == null ? Optional.empty() : ModTravelerTypeRegistry.get(registryId);
     }
 
     public static boolean clear(ItemStack stack) {
+        LegacyTravelerDataMigration.migrate(stack);
+        LegacyTravelerDataMigration.removeLegacyData(stack,
+                LegacyTravelerDataMigration.TRAVELER_KEY, LegacyTravelerDataMigration.SHADOW_KEY);
         boolean present = stack.remove(ModDataComponents.TRAVELER_TYPE.get()) != null;
         stack.remove(ModDataComponents.TRAVELER_SHADOW.get());
         if ((Object) stack instanceof ITravelerDummyHolder holder) {
@@ -51,6 +57,7 @@ public final class TravelerUtil {
     }
 
     public static ItemStack getShadow(ItemStack sophisticatedBackpack) {
+        LegacyTravelerDataMigration.migrate(sophisticatedBackpack);
         ItemContainerContents source = sophisticatedBackpack.get(ModDataComponents.TRAVELER_SHADOW.get());
         if (source == null || source.getSlots() == 0) {
             return ItemStack.EMPTY;
@@ -95,6 +102,7 @@ public final class TravelerUtil {
     }
 
     public static void setShadow(ItemStack sophisticatedBackpack, ItemStack travelerShadow) {
+        LegacyTravelerDataMigration.removeLegacyData(sophisticatedBackpack, LegacyTravelerDataMigration.SHADOW_KEY);
         if (travelerShadow.isEmpty()) {
             sophisticatedBackpack.remove(ModDataComponents.TRAVELER_SHADOW.get());
         } else {
