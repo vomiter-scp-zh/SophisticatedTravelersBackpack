@@ -23,7 +23,7 @@ public class BackpackItemMixin {
         if(travelerType == null) return;
         Integer mainColor = backpackStack.get(ModCoreDataComponents.MAIN_COLOR);
         if(mainColor == null){
-            cir.setReturnValue(0xFFFFFF);
+            cir.setReturnValue(0xFFFFFFFF);
         }
 
         cir.setReturnValue(fadeTint(cir.getReturnValue(), 0.1f));
@@ -40,6 +40,6 @@ public class BackpackItemMixin {
         green = Mth.floor(255.0F - (255.0F - green) * strength);
         blue = Mth.floor(255.0F - (255.0F - blue) * strength);
 
-        return red << 16 | green << 8 | blue;
+        return 0xFF000000 | (red << 16) | (green << 8) | blue;
     }
 }
