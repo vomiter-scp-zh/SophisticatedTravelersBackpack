@@ -1,6 +1,7 @@
 package com.vomiter.sophtravelerspack.util;
 
 import com.tiviacz.travelersbackpack.blocks.SleepingBagBlock;
+import com.vomiter.sophtravelerspack.common.registry.ModDataComponents;
 import com.tiviacz.travelersbackpack.common.ServerActions;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.core.BlockPos;
@@ -32,13 +33,16 @@ import java.util.concurrent.atomic.AtomicReference;
 public class SleepingBagUtils {
     private SleepingBagUtils(){}
 
-    final static String SLEEPING_BAG_DEPLOYED_KEY = "sleeping_bag_deployed";
-    static void setSleepingBagDeployed(ItemStack stack, boolean b){
-        var tag = stack.getOrCreateTag();
-        tag.putBoolean(SLEEPING_BAG_DEPLOYED_KEY, b);
+    static void setSleepingBagDeployed(ItemStack stack, boolean deployed) {
+        if (deployed) {
+            stack.set(ModDataComponents.SLEEPING_BAG_DEPLOYED.get(), true);
+        } else {
+            stack.remove(ModDataComponents.SLEEPING_BAG_DEPLOYED.get());
+        }
     }
-    public static boolean isSleepingBagDeployed(ItemStack stack){
-        return stack.hasTag() && stack.getTag().getBoolean(SLEEPING_BAG_DEPLOYED_KEY);
+
+    public static boolean isSleepingBagDeployed(ItemStack stack) {
+        return stack.getOrDefault(ModDataComponents.SLEEPING_BAG_DEPLOYED.get(), false);
     }
 
     public static void useSleepingBagFromItem(Player player) {

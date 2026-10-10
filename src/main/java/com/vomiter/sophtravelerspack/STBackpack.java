@@ -35,6 +35,7 @@ public class STBackpack {
         modEventBus.addListener(this::commonSetup);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         ModTravelerTypeRegistry.register(modEventBus);
+        ModDataComponents.register(modEventBus);
         ModRecipeSerializers.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         ModTabs.TABS.register(modEventBus);
