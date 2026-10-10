@@ -12,12 +12,14 @@ import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,12 +37,12 @@ public class STBackpackJeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(@NotNull IRecipeRegistration registration) {
-        List<CraftingRecipe> applyRecipes = new ArrayList<>();
-        List<CraftingRecipe> removeRecipes = new ArrayList<>();
+        List<RecipeHolder<CraftingRecipe>> applyRecipes = new ArrayList<>();
+        List<RecipeHolder<CraftingRecipe>> removeRecipes = new ArrayList<>();
 
         int index = 0;
 
-        for (Item item : ForgeRegistries.ITEMS.getValues()) {
+        for (Item item : BuiltInRegistries.ITEM) {
             if (!(item instanceof BackpackItem)) {
                 continue;
             }
@@ -56,8 +58,9 @@ public class STBackpackJeiPlugin implements IModPlugin {
                 ItemStack typedSophisticated = sophisticated.copy();
                 TravelerUtil.set(typedSophisticated, type);
 
-                applyRecipes.add(new ApplyTravelerTypeRecipe(
+                applyRecipes.add(new RecipeHolder<>(
                         STBackpack.modLoc("jei/apply_traveler_type_" + index),
+                        new ApplyTravelerTypeRecipe(
                         "",
                         CraftingBookCategory.MISC,
                         typedSophisticated.copy(),
@@ -66,10 +69,11 @@ public class STBackpackJeiPlugin implements IModPlugin {
                                 Ingredient.of(sophisticated),
                                 Ingredient.of(specialTraveler)
                         )
-                ));
+                )));
 
-                removeRecipes.add(new RemoveTravelerTypeRecipe(
+                removeRecipes.add(new RecipeHolder<>(
                         STBackpack.modLoc("jei/remove_traveler_type_" + index),
+                        new RemoveTravelerTypeRecipe(
                         "",
                         CraftingBookCategory.MISC,
                         sophisticated.copy(),
@@ -78,7 +82,7 @@ public class STBackpackJeiPlugin implements IModPlugin {
                                 Ingredient.of(typedSophisticated),
                                 Ingredient.of(standardTraveler)
                         )
-                ));
+                )));
 
                 index++;
             }

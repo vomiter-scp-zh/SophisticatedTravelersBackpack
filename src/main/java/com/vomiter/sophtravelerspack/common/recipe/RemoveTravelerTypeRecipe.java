@@ -7,9 +7,8 @@ import com.vomiter.sophtravelerspack.traveler.TravelerTypeInstance;
 import com.vomiter.sophtravelerspack.traveler.TravelerUtil;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -24,21 +23,20 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class RemoveTravelerTypeRecipe extends ShapelessRecipe {
     public RemoveTravelerTypeRecipe(
-            ResourceLocation id,
             String group,
             CraftingBookCategory category,
             ItemStack result,
             NonNullList<Ingredient> ingredients
     ) {
-        super(id, group, category, result, ingredients);
+        super(group, category, result, ingredients);
     }
 
     @Override
-    public boolean matches(CraftingContainer container, Level level) {
+    public boolean matches(CraftingInput container, Level level) {
         ItemStack sophisticatedBackpack = ItemStack.EMPTY;
         ItemStack standardTravelerBackpack = ItemStack.EMPTY;
 
-        for (int i = 0; i < container.getContainerSize(); i++) {
+        for (int i = 0; i < container.size(); i++) {
             ItemStack stack = container.getItem(i);
 
             if (stack.isEmpty()) {
@@ -80,12 +78,12 @@ public class RemoveTravelerTypeRecipe extends ShapelessRecipe {
 
     @Override
     public ItemStack assemble(
-            CraftingContainer container,
-            RegistryAccess registryAccess
+            CraftingInput container,
+            HolderLookup.Provider registries
     ) {
         ItemStack sophisticatedBackpack = ItemStack.EMPTY;
 
-        for (int i = 0; i < container.getContainerSize(); i++) {
+        for (int i = 0; i < container.size(); i++) {
             ItemStack stack = container.getItem(i);
 
             if (stack.getItem() instanceof BackpackItem) {
@@ -114,17 +112,17 @@ public class RemoveTravelerTypeRecipe extends ShapelessRecipe {
 
     @Override
     public NonNullList<ItemStack> getRemainingItems(
-            CraftingContainer container
+            CraftingInput container
     ) {
         NonNullList<ItemStack> remaining = NonNullList.withSize(
-                container.getContainerSize(),
+                container.size(),
                 ItemStack.EMPTY
         );
 
         TravelerTypeInstance travelerType = null;
         int standardBackpackSlot = -1;
 
-        for (int i = 0; i < container.getContainerSize(); i++) {
+        for (int i = 0; i < container.size(); i++) {
             ItemStack stack = container.getItem(i);
 
             if (stack.isEmpty()) {

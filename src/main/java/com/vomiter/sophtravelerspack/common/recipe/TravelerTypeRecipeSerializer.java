@@ -1,56 +1,48 @@
 package com.vomiter.sophtravelerspack.common.recipe;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.NonNullList;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
-import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class TravelerTypeRecipeSerializer<T extends ShapelessRecipe>
-        extends ShapelessRecipe.Serializer {
-
+public class TravelerTypeRecipeSerializer<T extends ShapelessRecipe> implements RecipeSerializer<T> {
     private final Factory<T> factory;
+    private final MapCodec<T> codec;
+    private final StreamCodec<RegistryFriendlyByteBuf, T> streamCodec;
 
     public TravelerTypeRecipeSerializer(Factory<T> factory) {
         this.factory = factory;
+        ShapelessRecipe.Serializer vanilla = new ShapelessRecipe.Serializer();
+        codec = vanilla.codec().xmap(this::convert, recipe -> recipe);
+        streamCodec = vanilla.streamCodec().map(this::convert, recipe -> recipe);
     }
 
     @Override
-    public T fromJson(ResourceLocation id, JsonObject json) {
-        ShapelessRecipe vanillaRecipe = super.fromJson(id, json);
-
-        return convert(id, vanillaRecipe);
+    public MapCodec<T> codec() {
+        return codec;
     }
 
     @Override
-    public T fromNetwork(
-            ResourceLocation id,
-            FriendlyByteBuf buffer
-    ) {
-        ShapelessRecipe vanillaRecipe =
-                super.fromNetwork(id, buffer);
-
-        return convert(id, vanillaRecipe);
+    public StreamCodec<RegistryFriendlyByteBuf, T> streamCodec() {
+        return streamCodec;
     }
 
-    private T convert(
-            ResourceLocation id,
-            ShapelessRecipe recipe
-    ) {
+    private T convert(ShapelessRecipe recipe) {
         return factory.create(
-                id,
                 recipe.getGroup(),
                 recipe.category(),
-                ModItems.BACKPACK.get().getDefaultInstance(),
+                recipe.getResultItem(RegistryAccess.EMPTY).copy(),
                 recipe.getIngredients()
         );
     }
@@ -58,7 +50,6 @@ public class TravelerTypeRecipeSerializer<T extends ShapelessRecipe>
     @FunctionalInterface
     public interface Factory<T extends ShapelessRecipe> {
         T create(
-                ResourceLocation id,
                 String group,
                 CraftingBookCategory category,
                 ItemStack result,
