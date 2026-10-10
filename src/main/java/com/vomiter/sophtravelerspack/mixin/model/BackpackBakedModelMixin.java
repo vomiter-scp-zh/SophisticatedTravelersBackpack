@@ -15,8 +15,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelProperty;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlockEntity;
 import net.p3pp3rf1y.sophisticatedbackpacks.client.render.BackpackDynamicModel;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.IRenderedBatteryUpgrade;
@@ -190,7 +190,7 @@ public abstract class BackpackBakedModelMixin implements BackpackModelsExtension
             at = @At(value = "INVOKE",
                     target = "Lnet/p3pp3rf1y/sophisticatedbackpacks/client/render/BackpackDynamicModel$BackpackBakedModel;" +
                             "setPropertiesFromModelData" +
-                            "(Lnet/minecraftforge/client/model/data/ModelData;)V",
+                            "(Lnet/neoforged/neoforge/client/model/data/ModelData;)V",
                     shift = At.Shift.AFTER,
                     remap = false),
             cancellable = true,

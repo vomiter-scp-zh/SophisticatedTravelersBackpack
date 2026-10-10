@@ -15,8 +15,7 @@ public class NeoForgeEventHandlerMixin {
             method = "playerTick",
             at = @At(
                     value = "INVOKE",
-                    target = "Lcom/tiviacz/travelersbackpack/capability/CapabilityUtils;" +
-                            "isWearingBackpack(Lnet/minecraft/world/entity/player/Player;)Z"
+                    target = "Lcom/tiviacz/travelersbackpack/capability/AttachmentUtils;isWearingBackpack(Lnet/minecraft/world/entity/player/Player;)Z"
             )
     )
     private static boolean sophtravelerspack$isWearingBackpack(
@@ -31,9 +30,7 @@ public class NeoForgeEventHandlerMixin {
             method = "playerTick",
             at = @At(
                     value = "INVOKE",
-                    target = "Lcom/tiviacz/travelersbackpack/capability/CapabilityUtils;" +
-                            "getWearingBackpack(Lnet/minecraft/world/entity/player/Player;)" +
-                            "Lnet/minecraft/world/item/ItemStack;"
+                    target = "Lcom/tiviacz/travelersbackpack/capability/AttachmentUtils;getWearingBackpack(Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/item/ItemStack;"
             )
     )
     private static ItemStack sophtravelerspack$getWearingBackpack(

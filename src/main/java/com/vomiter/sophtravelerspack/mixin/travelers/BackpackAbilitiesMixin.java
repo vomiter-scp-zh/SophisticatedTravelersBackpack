@@ -11,14 +11,14 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(value = BackpackAbilities.class, remap = false)
 public class BackpackAbilitiesMixin {
-    @WrapOperation(method = "checkBackpack", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/capability/CapabilityUtils;isWearingBackpack(Lnet/minecraft/world/entity/player/Player;)Z"))
+    @WrapOperation(method = "checkBackpack", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/capability/AttachmentUtils;isWearingBackpack(Lnet/minecraft/world/entity/player/Player;)Z"))
     private boolean stbp$isWearingBackpack(Player player, Operation<Boolean> original){
         boolean originalResult = original.call(player);
         if (originalResult) return true;
         return !TravelerUtil.getShadow(player).isEmpty();
     }
 
-    @WrapOperation(method = "checkBackpack", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/capability/CapabilityUtils;getWearingBackpack(Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/item/ItemStack;"))
+    @WrapOperation(method = "checkBackpack", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/capability/AttachmentUtils;getWearingBackpack(Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/item/ItemStack;"))
     private ItemStack stbp$checkBackpack(Player player, Operation<ItemStack> original){
         var originalResult = original.call(player);
         if (originalResult.isEmpty()){

@@ -10,9 +10,4 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(BackpackDynamicModel.Loader.class)
 public interface BackpackDynamicModelLoaderAccessor {
-    @Invoker("parseTextureLocationOrReference")
-    Either<Material, String> stbp$parseTextureLocationOrReference(
-            ResourceLocation location,
-            @NotNull String name
-    );
 }

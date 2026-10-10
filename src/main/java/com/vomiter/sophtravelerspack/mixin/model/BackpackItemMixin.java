@@ -2,10 +2,10 @@ package com.vomiter.sophtravelerspack.mixin.model;
 
 import com.vomiter.sophtravelerspack.traveler.TravelerType;
 import com.vomiter.sophtravelerspack.traveler.TravelerTypeInstance;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
+import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,8 +21,8 @@ public class BackpackItemMixin {
     private static void stbp$getMainColor(ItemStack backpackStack, CallbackInfoReturnable<Integer> cir){
         TravelerTypeInstance travelerType = TravelerType.getTravelerTypeFromBackpack(backpackStack);
         if(travelerType == null) return;
-        CompoundTag tag = backpackStack.getTag();
-        if(tag == null || !tag.contains("clothColor")){
+        Integer mainColor = backpackStack.get(ModCoreDataComponents.MAIN_COLOR);
+        if(mainColor == null){
             cir.setReturnValue(0xFFFFFF);
         }
 

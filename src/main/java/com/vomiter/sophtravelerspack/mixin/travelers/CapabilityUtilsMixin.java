@@ -2,7 +2,7 @@ package com.vomiter.sophtravelerspack.mixin.travelers;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.tiviacz.travelersbackpack.capability.CapabilityUtils;
+import com.tiviacz.travelersbackpack.capability.AttachmentUtils;
 import com.tiviacz.travelersbackpack.inventory.BackpackWrapper;
 import com.tiviacz.travelersbackpack.items.TravelersBackpackItem;
 import com.vomiter.sophtravelerspack.traveler.TravelerUtil;
@@ -10,7 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(value = CapabilityUtils.class, remap = false)
+@Mixin(value = AttachmentUtils.class, remap = false)
 public class CapabilityUtilsMixin {
     @WrapMethod(method = "getBackpackWrapper(Lnet/minecraft/world/entity/player/Player;)Lcom/tiviacz/travelersbackpack/inventory/BackpackWrapper;")
     private static BackpackWrapper srbp$getBackpackWrapperArtificial(Player player, Operation<BackpackWrapper> original){

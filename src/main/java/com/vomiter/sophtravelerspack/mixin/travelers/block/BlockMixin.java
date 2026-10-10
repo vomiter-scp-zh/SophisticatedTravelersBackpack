@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(Block.class)
 public class BlockMixin {
     @WrapMethod(method = "playerWillDestroy")
-    private void stbp$playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player, Operation<Void> original) {
+    private BlockState stbp$playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player, Operation<Void> original) {
         if (!world.isClientSide() && world.getBlockEntity(pos) instanceof BackpackBlockEntity backpackBlockEntity) {
             ItemStack sophisticatedBackpack = backpackBlockEntity.getBackpackWrapper().getBackpack();
             ItemStack shadow = TravelerUtil.getShadow(sophisticatedBackpack);
@@ -38,4 +38,5 @@ public class BlockMixin {
         }
 
         original.call(world, pos, state, player);
+        return state;
     }}

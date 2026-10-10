@@ -9,7 +9,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,11 +27,5 @@ public class TravelerDynamicBackpackModelMixin {
         var originalResult = original.call(instance, o);
         BakedSTBackpackModels.putExtraModel(block, originalResult);
         return originalResult;
-    }
-
-    @WrapOperation(method = "addTanks", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/BakedModel;getQuads(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/util/RandomSource;Lnet/minecraftforge/client/model/data/ModelData;Lnet/minecraft/client/renderer/RenderType;)Ljava/util/List;"))
-    private List stbp$addTanks(BakedModel instance, BlockState state, Direction direction, RandomSource randomSource, ModelData modelData, RenderType renderType, Operation<List> original){
-        BakedSTBackpackModels.putTankModel(block, instance);
-        return original.call(instance, state, direction, randomSource, modelData, renderType);
     }
 }

@@ -15,13 +15,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.p3pp3rf1y.sophisticatedbackpacks.api.CapabilityBackpackWrapper;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackFluidHandler;
-import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.IBackpackWrapper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,22 +35,22 @@ public class HoseItemMixin {
     private ThreadLocal<FluidTank> tankThreadLocal = new ThreadLocal<>();
 
 
-    @WrapOperation(method = "use", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/capability/CapabilityUtils;isWearingBackpack(Lnet/minecraft/world/entity/player/Player;)Z"))
+    @WrapOperation(method = "use", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/capability/AttachmentUtils;isWearingBackpack(Lnet/minecraft/world/entity/player/Player;)Z"))
     private boolean stbp$isWearingBackpack(Player player, Operation<Boolean> original){
         if (original.call(player)) return true;
         return !SophisticatedUtil.getSophBackpackOnBack(player).isEmpty();
     }
 
-    @WrapOperation(method = "use", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/capability/CapabilityUtils;getBackpackWrapper(Lnet/minecraft/world/entity/player/Player;[I)Lcom/tiviacz/travelersbackpack/inventory/BackpackWrapper;"))
+    @WrapOperation(method = "use", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/capability/AttachmentUtils;getBackpackWrapper(Lnet/minecraft/world/entity/player/Player;[I)Lcom/tiviacz/travelersbackpack/inventory/BackpackWrapper;"))
     private BackpackWrapper stbp$getDummyBackpackWrapper(Player player, int[] dataLoad, Operation<BackpackWrapper> original){
         ItemStack sophBackpack = SophisticatedUtil.getSophBackpackOnBack(player);
         if (sophBackpack.isEmpty()) return original.call(player, dataLoad);
-        LazyOptional<IBackpackWrapper> sWrapper = sophBackpack.getCapability(CapabilityBackpackWrapper.BACKPACK_WRAPPER_CAPABILITY);
-        if (!sWrapper.isPresent()) return original.call(player, dataLoad);
-        if (sWrapper.resolve().get().getFluidHandler().isPresent() && sWrapper.resolve().get().getFluidHandler().get() instanceof BackpackFluidHandler backpackFluidHandler){
+        var sWrapper = net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackWrapper.fromStack(sophBackpack);
+        if (sWrapper == null) return original.call(player, dataLoad);
+        if (sWrapper.getFluidHandler().isPresent() && sWrapper.getFluidHandler().get() instanceof BackpackFluidHandler backpackFluidHandler){
             ItemStack dummyStack = ModItems.STANDARD_TRAVELERS_BACKPACK.get().getDefaultInstance();
             BackpackWrapper wrapper = BackpackWrapper.fromStack(dummyStack);
-            wrapper.upgrades.setStackInSlot(
+            wrapper.getUpgrades().setStackInSlot(
                     0,
                     ModItems.TANKS_UPGRADE.get().getDefaultInstance()
             );
@@ -65,7 +62,7 @@ public class HoseItemMixin {
         }
     }
 
-    @WrapOperation(method = "use", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/items/HoseItem;getSelectedFluidTank(Lnet/minecraft/world/item/ItemStack;Lcom/tiviacz/travelersbackpack/inventory/upgrades/tanks/TanksUpgrade;)Lnet/minecraftforge/fluids/capability/templates/FluidTank;"))
+    @WrapOperation(method = "use", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/items/HoseItem;getSelectedFluidTank(Lnet/minecraft/world/item/ItemStack;Lcom/tiviacz/travelersbackpack/inventory/upgrades/tanks/TanksUpgrade;)Lnet/neoforged/neoforge/fluids/capability/templates/FluidTank;"))
     private FluidTank stbp$getTank(HoseItem instance, ItemStack stack, TanksUpgrade upgrade, Operation<FluidTank> original){
         if (fluidHandlerThreadLocal.get() == null) return original.call(instance, stack, upgrade);
         var fluidHandler = fluidHandlerThreadLocal.get();
@@ -102,22 +99,22 @@ public class HoseItemMixin {
         }
     }
 
-    @WrapOperation(method = "finishUsingItem", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/capability/CapabilityUtils;isWearingBackpack(Lnet/minecraft/world/entity/player/Player;)Z"))
+    @WrapOperation(method = "finishUsingItem", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/capability/AttachmentUtils;isWearingBackpack(Lnet/minecraft/world/entity/player/Player;)Z"))
     private boolean stbp$isWearingBackpackAtFinish(Player player, Operation<Boolean> original){
         if (original.call(player)) return true;
         return !SophisticatedUtil.getSophBackpackOnBack(player).isEmpty();
     }
 
-    @WrapOperation(method = "finishUsingItem", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/capability/CapabilityUtils;getBackpackWrapper(Lnet/minecraft/world/entity/player/Player;[I)Lcom/tiviacz/travelersbackpack/inventory/BackpackWrapper;"))
+    @WrapOperation(method = "finishUsingItem", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/capability/AttachmentUtils;getBackpackWrapper(Lnet/minecraft/world/entity/player/Player;[I)Lcom/tiviacz/travelersbackpack/inventory/BackpackWrapper;"))
     private BackpackWrapper stbp$getDummyBackpackWrapperAtFinish(Player player, int[] dataLoad, Operation<BackpackWrapper> original){
         ItemStack sophBackpack = SophisticatedUtil.getSophBackpackOnBack(player);
         if (sophBackpack.isEmpty()) return original.call(player, dataLoad);
-        LazyOptional<IBackpackWrapper> sWrapper = sophBackpack.getCapability(CapabilityBackpackWrapper.BACKPACK_WRAPPER_CAPABILITY);
-        if (!sWrapper.isPresent()) return original.call(player, dataLoad);
-        if (sWrapper.resolve().get().getFluidHandler().isPresent() && sWrapper.resolve().get().getFluidHandler().get() instanceof BackpackFluidHandler backpackFluidHandler){
+        var sWrapper = net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackWrapper.fromStack(sophBackpack);
+        if (sWrapper == null) return original.call(player, dataLoad);
+        if (sWrapper.getFluidHandler().isPresent() && sWrapper.getFluidHandler().get() instanceof BackpackFluidHandler backpackFluidHandler){
             ItemStack dummyStack = ModItems.STANDARD_TRAVELERS_BACKPACK.get().getDefaultInstance();
             BackpackWrapper wrapper = BackpackWrapper.fromStack(dummyStack);
-            wrapper.upgrades.setStackInSlot(
+            wrapper.getUpgrades().setStackInSlot(
                     0,
                     ModItems.TANKS_UPGRADE.get().getDefaultInstance()
             );
@@ -129,7 +126,7 @@ public class HoseItemMixin {
         }
     }
 
-    @WrapOperation(method = "finishUsingItem", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/items/HoseItem;getSelectedFluidTank(Lnet/minecraft/world/item/ItemStack;Lcom/tiviacz/travelersbackpack/inventory/upgrades/tanks/TanksUpgrade;)Lnet/minecraftforge/fluids/capability/templates/FluidTank;"))
+    @WrapOperation(method = "finishUsingItem", at = @At(value = "INVOKE", target = "Lcom/tiviacz/travelersbackpack/items/HoseItem;getSelectedFluidTank(Lnet/minecraft/world/item/ItemStack;Lcom/tiviacz/travelersbackpack/inventory/upgrades/tanks/TanksUpgrade;)Lnet/neoforged/neoforge/fluids/capability/templates/FluidTank;"))
     private FluidTank stbp$getTankAtFinish(HoseItem instance, ItemStack stack, TanksUpgrade upgrade, Operation<FluidTank> original){
         if (fluidHandlerThreadLocal.get() == null) return original.call(instance, stack, upgrade);
         var fluidHandler = fluidHandlerThreadLocal.get();

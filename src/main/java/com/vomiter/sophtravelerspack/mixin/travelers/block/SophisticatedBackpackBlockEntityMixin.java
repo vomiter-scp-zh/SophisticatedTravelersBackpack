@@ -7,8 +7,8 @@ import com.vomiter.sophtravelerspack.traveler.TravelerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -31,7 +31,7 @@ public class SophisticatedBackpackBlockEntityMixin {
         if(!isCactus) return;
         if (mixin.stbp$cactusCounter >= 1000 && backpackBlockEntity.getBackpackWrapper().getFluidHandler().isPresent()){
             var fluidHandler = backpackBlockEntity.getBackpackWrapper().getFluidHandler().get();
-            var result = fluidHandler.fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
+            var result = fluidHandler.fill(new FluidStack(Fluids.WATER, 1000), OIFluidHandler.FluidAction.EXECUTE);
             if(result > 0){
                 mixin.stbp$cactusCounter = 0;
             }
