@@ -59,6 +59,11 @@ public class ClientEventHandler {
         var tooltipComponents = event.getToolTip();
         ItemStack stack = TravelerUtil.getShadow(sbpStack);
         if (!(stack.getItem() instanceof TravelersBackpackItem travelersBackpackItem)) return;
+        if (
+                stack.is(ModItems.BOOKSHELF_TRAVELERS_BACKPACK.get())
+                || stack.is(ModItems.REDSTONE_TRAVELERS_BACKPACK.get())
+        ) return;
+
         if (BackpackAbilities.ALLOWED_ABILITIES.contains(stack.getItem()) && (Boolean)TravelersBackpackConfig.SERVER.backpackAbilities.enableBackpackAbilities.get()) {
             if (KeyHelper.isCtrlPressed()) {
                 if (BackpackAbilities.CUSTOM_DESCRIPTIONS.contains(stack.getItem())) {
