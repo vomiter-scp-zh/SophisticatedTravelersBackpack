@@ -1,21 +1,24 @@
 package com.vomiter.sophtravelerspack.network;
 
 import net.minecraft.client.Minecraft;
-import net.p3pp3rf1y.sophisticatedbackpacks.api.CapabilityBackpackWrapper;
+import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackWrapper;
+import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContainer;
 import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
-import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 
 public class ModNetworkClientHandler {
-    static void handleMBPSyncResponse(ModNetwork.MBPSyncResponse response){
-        assert Minecraft.getInstance().player != null;
-        PlayerInventoryProvider.get().runOnBackpacks(
-                Minecraft.getInstance().player,
-                ((backpack, s, s1, i) -> {
-                    backpack.getCapability(CapabilityBackpackWrapper.getCapabilityInstance()).ifPresent(
-                            IStorageWrapper::onContentsNbtUpdated
-                    );
-                    return true;
-        }));
+    static void handleMBPSyncResponse(ModNetwork.MBPSyncResponse response) {
+        var player = Minecraft.getInstance().player;
+        if (player == null) return;
+        PlayerInventoryProvider.get().runOnBackpacks(player, (backpack, inventoryName, identifier, slot) -> {
+            var wrapper = BackpackWrapper.fromStack(backpack);
+            if (wrapper.getContentsUuid().filter(response.uuid()::equals).isPresent()) {
+                wrapper.onContentsNbtUpdated();
+            }
+            return false;
+        });
+        if (player.containerMenu instanceof BackpackContainer menu
+                && menu.getStorageWrapper().getContentsUuid().filter(response.uuid()::equals).isPresent()) {
+            menu.getStorageWrapper().onContentsNbtUpdated();
+        }
     }
-
 }

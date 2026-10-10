@@ -1,6 +1,7 @@
 package com.vomiter.sophtravelerspack.client;
 
 import com.vomiter.sophtravelerspack.network.ModNetwork;
+import net.neoforged.neoforge.network.PacketDistributor;
 import com.vomiter.sophtravelerspack.util.SleepingBagUtils;
 import com.tiviacz.travelersbackpack.init.ModItems;
 import net.minecraft.client.gui.GuiGraphics;
@@ -34,8 +35,8 @@ public final class SleepingBagScreenButton {
             var menu = screen.getMenu();
             if (!menu.isFirstLevelStorage()) return;
             menu.getBlockPosition().ifPresentOrElse(
-                    pos -> ModNetwork.CHANNEL.sendToServer(new ModNetwork.InWorldSBPSleepingBagRequest(menu.containerId, pos)),
-                    () -> ModNetwork.CHANNEL.sendToServer(new ModNetwork.EuipSBPSleepingBagRequest(menu.containerId))
+                    pos -> PacketDistributor.sendToServer(new ModNetwork.InWorldSBPSleepingBagRequest(menu.containerId, pos)),
+                    () -> PacketDistributor.sendToServer(new ModNetwork.EuipSBPSleepingBagRequest(menu.containerId))
             );
         }) {
             @Override

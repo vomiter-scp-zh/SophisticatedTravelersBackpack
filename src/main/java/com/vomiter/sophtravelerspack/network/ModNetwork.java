@@ -2,111 +2,82 @@ package com.vomiter.sophtravelerspack.network;
 
 import com.vomiter.sophtravelerspack.STBackpack;
 import com.vomiter.sophtravelerspack.util.SleepingBagUtils;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
-import net.p3pp3rf1y.sophisticatedbackpacks.api.CapabilityBackpackWrapper;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackStorage;
+import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
 import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContainer;
 import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContext;
 
-import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public class ModNetwork {
     private static final String PROTOCOL = "1";
-    public static SimpleChannel CHANNEL;
-    public static void onCommonSetup(final FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> {
-            CHANNEL = NetworkRegistry.newSimpleChannel(
-                    STBackpack.modLoc("main"),
-                    () -> PROTOCOL, PROTOCOL::equals, PROTOCOL::equals
-            );
 
-            int id = 0;
-            CHANNEL.messageBuilder(MBPSyncRequest.class, id++, NetworkDirection.PLAY_TO_SERVER)
-                    .encoder(MBPSyncRequest::encode)
-                    .decoder(MBPSyncRequest::decode)
-                    .consumerMainThread(MBPSyncRequest::handle)
-                    .add();
-            CHANNEL.messageBuilder(MBPSyncResponse.class, id++, NetworkDirection.PLAY_TO_CLIENT)
-                    .encoder(MBPSyncResponse::encode)
-                    .decoder(MBPSyncResponse::decode)
-                    .consumerMainThread(MBPSyncResponse::handle)
-                    .add();
-            CHANNEL.messageBuilder(EuipSBPSleepingBagRequest.class, id++, NetworkDirection.PLAY_TO_SERVER)
-                    .encoder(EuipSBPSleepingBagRequest::encode)
-                    .decoder(EuipSBPSleepingBagRequest::decode)
-                    .consumerMainThread(EuipSBPSleepingBagRequest::handle)
-                    .add();
-            CHANNEL.messageBuilder(InWorldSBPSleepingBagRequest.class, id++, NetworkDirection.PLAY_TO_SERVER)
-                    .encoder(InWorldSBPSleepingBagRequest::encode)
-                    .decoder(InWorldSBPSleepingBagRequest::decode)
-                    .consumerMainThread(InWorldSBPSleepingBagRequest::handle)
-                    .add();
-
-        });
-
+    public static void registerPayloads(RegisterPayloadHandlersEvent event) {
+        var registrar = event.registrar(PROTOCOL);
+        registrar.playToServer(MBPSyncRequest.TYPE, MBPSyncRequest.STREAM_CODEC, MBPSyncRequest::handle);
+        registrar.playToClient(MBPSyncResponse.TYPE, MBPSyncResponse.STREAM_CODEC, MBPSyncResponse::handle);
+        registrar.playToServer(EuipSBPSleepingBagRequest.TYPE, EuipSBPSleepingBagRequest.STREAM_CODEC,
+                EuipSBPSleepingBagRequest::handle);
+        registrar.playToServer(InWorldSBPSleepingBagRequest.TYPE, InWorldSBPSleepingBagRequest.STREAM_CODEC,
+                InWorldSBPSleepingBagRequest::handle);
     }
 
-    public record MBPSyncResponse(UUID uuid, CompoundTag tag){
-        public static void encode(MBPSyncResponse pkt, FriendlyByteBuf buf){
-            buf.writeUUID(pkt.uuid);
-            buf.writeNbt(pkt.tag);
+    public record MBPSyncResponse(UUID uuid, CompoundTag tag) implements CustomPacketPayload {
+        public static final Type<MBPSyncResponse> TYPE = new Type<>(STBackpack.modLoc("backpack_sync_response"));
+        public static final StreamCodec<ByteBuf, MBPSyncResponse> STREAM_CODEC = StreamCodec.composite(
+                UUIDUtil.STREAM_CODEC, MBPSyncResponse::uuid,
+                ByteBufCodecs.COMPOUND_TAG, MBPSyncResponse::tag,
+                MBPSyncResponse::new);
+
+        @Override
+        public Type<MBPSyncResponse> type() {
+            return TYPE;
         }
 
-        public static MBPSyncResponse decode(FriendlyByteBuf buf){
-            return new MBPSyncResponse(buf.readUUID(), buf.readNbt());
-        }
-
-        public static void handle(MBPSyncResponse pkt, Supplier<NetworkEvent.Context> ctx) {
-            BackpackStorage.get().setBackpackContents(pkt.uuid, pkt.tag);
-            ModNetworkClientHandler.handleMBPSyncResponse(pkt);
-            ctx.get().setPacketHandled(true);
-
+        public static void handle(MBPSyncResponse packet, IPayloadContext context) {
+            BackpackStorage.get().setBackpackContents(packet.uuid, packet.tag);
+            ModNetworkClientHandler.handleMBPSyncResponse(packet);
         }
     }
 
-    public record MBPSyncRequest(UUID uuid){
-        public static void encode(MBPSyncRequest pkt, FriendlyByteBuf buf) {
-            buf.writeUUID(pkt.uuid);
+    public record MBPSyncRequest(UUID uuid) implements CustomPacketPayload {
+        public static final Type<MBPSyncRequest> TYPE = new Type<>(STBackpack.modLoc("backpack_sync_request"));
+        public static final StreamCodec<ByteBuf, MBPSyncRequest> STREAM_CODEC = StreamCodec.composite(
+                UUIDUtil.STREAM_CODEC, MBPSyncRequest::uuid, MBPSyncRequest::new);
+
+        @Override
+        public Type<MBPSyncRequest> type() {
+            return TYPE;
         }
-        public static MBPSyncRequest decode(FriendlyByteBuf buf) {
-            return new MBPSyncRequest(buf.readUUID());
-        }
-        public static void handle(MBPSyncRequest pkt, Supplier<NetworkEvent.Context> ctx) {
-            var sourceContents = BackpackStorage.get()
-                    .getOrCreateBackpackContents(
-                            pkt.uuid
-                    );
 
-            CompoundTag responseContents =
-                    copyInventoryContents(sourceContents);
+        public static void handle(MBPSyncRequest packet, IPayloadContext context) {
+            if (!(context.player() instanceof ServerPlayer player)) return;
+            PlayerInventoryProvider.get().runOnBackpacks(player, (backpack, inventoryName, identifier, slot) -> {
+                if (!(backpack.getItem() instanceof BackpackItem)) return false;
+                var contentsUuid = BackpackWrapper.fromStack(backpack).getContentsUuid();
+                if (contentsUuid.isEmpty() || !contentsUuid.get().equals(packet.uuid)) return false;
 
-            PlayerInventoryProvider.get().runOnBackpacks(Objects.requireNonNull(ctx.get().getSender()), ((backpack, s, s1, i) -> {
-                backpack.getCapability(CapabilityBackpackWrapper.getCapabilityInstance()).ifPresent(iBackpackWrapper -> {
-                    iBackpackWrapper.getContentsUuid().ifPresent(uuid1 -> {
-                        if (uuid1.equals(pkt.uuid)){
-                            CHANNEL.send(
-                                    PacketDistributor.PLAYER.with(() -> ctx.get().getSender()),
-                                    new MBPSyncResponse(uuid1, responseContents)
-                            );
-                        }
-                    });
-                });
-                return false;
-            }));
-
-            ctx.get().setPacketHandled(true);
+                // Validate possession before querying storage; never create contents for an arbitrary UUID.
+                BackpackStorage.get().getBackpackContents(packet.uuid).ifPresent(contents ->
+                        PacketDistributor.sendToPlayer(player,
+                                new MBPSyncResponse(packet.uuid, copyInventoryContents(contents))));
+                return true;
+            });
         }
 
         private static CompoundTag copyInventoryContents(
@@ -131,42 +102,54 @@ public class ModNetwork {
         }
     }
 
-    public record EuipSBPSleepingBagRequest(int containerId) {
-        public static void encode(EuipSBPSleepingBagRequest packet, FriendlyByteBuf buffer) {
-            buffer.writeVarInt(packet.containerId);
+    public record EuipSBPSleepingBagRequest(int containerId) implements CustomPacketPayload {
+        public static final Type<EuipSBPSleepingBagRequest> TYPE =
+                new Type<>(STBackpack.modLoc("equipped_sleeping_bag"));
+        public static final StreamCodec<ByteBuf, EuipSBPSleepingBagRequest> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, EuipSBPSleepingBagRequest::containerId, EuipSBPSleepingBagRequest::new);
+
+        @Override
+        public Type<EuipSBPSleepingBagRequest> type() {
+            return TYPE;
         }
 
-        public static EuipSBPSleepingBagRequest decode(FriendlyByteBuf buffer) {
-            return new EuipSBPSleepingBagRequest(buffer.readVarInt());
-        }
-
-        public static void handle(EuipSBPSleepingBagRequest packet, Supplier<NetworkEvent.Context> context) {
-            var player = context.get().getSender();
-            if (player != null && player.containerMenu instanceof BackpackContainer menu
+        public static void handle(EuipSBPSleepingBagRequest packet, IPayloadContext context) {
+            var player = context.player();
+            if (player instanceof ServerPlayer && player.containerMenu instanceof BackpackContainer menu
                     && menu.containerId == packet.containerId && menu.stillValid(player)
                     && menu.isFirstLevelStorage()
                     && menu.getBackpackContext().getType() == BackpackContext.ContextType.ITEM_BACKPACK) {
                 SleepingBagUtils.useSleepingBagFromItem(player);
             }
-            context.get().setPacketHandled(true);
         }
     }
 
-    public record InWorldSBPSleepingBagRequest(int containerId, BlockPos pos) {
-        public static void encode(InWorldSBPSleepingBagRequest packet, FriendlyByteBuf buffer) {
+    public record InWorldSBPSleepingBagRequest(int containerId, BlockPos pos) implements CustomPacketPayload {
+        public static final Type<InWorldSBPSleepingBagRequest> TYPE =
+                new Type<>(STBackpack.modLoc("world_sleeping_bag"));
+        public static final StreamCodec<FriendlyByteBuf, InWorldSBPSleepingBagRequest> STREAM_CODEC =
+                StreamCodec.of(InWorldSBPSleepingBagRequest::encode, InWorldSBPSleepingBagRequest::decode);
+
+        private static void encode(FriendlyByteBuf buffer, InWorldSBPSleepingBagRequest packet) {
             buffer.writeVarInt(packet.containerId);
             buffer.writeBlockPos(packet.pos);
         }
 
-        public static InWorldSBPSleepingBagRequest decode(FriendlyByteBuf buffer) {
+        private static InWorldSBPSleepingBagRequest decode(FriendlyByteBuf buffer) {
             return new InWorldSBPSleepingBagRequest(buffer.readVarInt(), buffer.readBlockPos());
         }
 
-        public static void handle(InWorldSBPSleepingBagRequest packet, Supplier<NetworkEvent.Context> context) {
-            var player = context.get().getSender();
-            if (player != null && player.containerMenu instanceof BackpackContainer menu
+        @Override
+        public Type<InWorldSBPSleepingBagRequest> type() {
+            return TYPE;
+        }
+
+        public static void handle(InWorldSBPSleepingBagRequest packet, IPayloadContext context) {
+            var player = context.player();
+            if (player instanceof ServerPlayer && player.containerMenu instanceof BackpackContainer menu
                     && menu.containerId == packet.containerId && menu.stillValid(player)
                     && menu.isFirstLevelStorage() && menu.getBlockPosition().filter(packet.pos::equals).isPresent()
+                    && player.level().hasChunkAt(packet.pos)
                     && player.distanceToSqr(packet.pos.getX() + 0.5, packet.pos.getY() + 0.5, packet.pos.getZ() + 0.5) <= 64) {
                 if (SleepingBagUtils.isSleepingBagDeployed(menu.getStorageWrapper().getBackpack())) {
                     SleepingBagUtils.recoverSleepingBagIntoSBP(player.level(), packet.pos);
@@ -174,7 +157,6 @@ public class ModNetwork {
                     SleepingBagUtils.deploySleepingBagFromSBP(player.level(), packet.pos);
                 }
             }
-            context.get().setPacketHandled(true);
         }
     }
 }

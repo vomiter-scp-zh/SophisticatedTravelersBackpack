@@ -40,7 +40,7 @@ public class STBackpack {
         ModItems.ITEMS.register(modEventBus);
         ModTabs.TABS.register(modEventBus);
         modEventBus.addListener(ModUpgradeContainers::register);
-        modEventBus.addListener(ModNetwork::onCommonSetup);
+        modEventBus.addListener(ModNetwork::registerPayloads);
         MinecraftForge.EVENT_BUS.addListener(STBPCommand::register);
         MinecraftForge.EVENT_BUS.addListener(SleepingBagCommand::register);
         EventHandler.init();

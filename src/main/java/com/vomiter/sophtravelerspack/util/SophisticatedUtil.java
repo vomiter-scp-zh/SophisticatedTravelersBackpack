@@ -1,11 +1,11 @@
 package com.vomiter.sophtravelerspack.util;
 
 import com.vomiter.sophtravelerspack.network.ModNetwork;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.minecraft.Util;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.p3pp3rf1y.sophisticatedbackpacks.api.CapabilityBackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.IBackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
@@ -60,7 +60,7 @@ public class SophisticatedUtil {
 
         lastRequestTime = now;
         runOnBackpack(player, (backpackWrapper -> {
-            backpackWrapper.getContentsUuid().ifPresent(uuid -> ModNetwork.CHANNEL.sendToServer(new ModNetwork.MBPSyncRequest(uuid)));
+            backpackWrapper.getContentsUuid().ifPresent(uuid -> PacketDistributor.sendToServer(new ModNetwork.MBPSyncRequest(uuid)));
             return false;
         }));
     }
