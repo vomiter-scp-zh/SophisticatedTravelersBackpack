@@ -72,7 +72,7 @@ public enum TravelerType {
         ItemStack stack = getItem().getDefaultInstance();
         if (this == CACTUS) {
             BackpackWrapper wrapper = BackpackWrapper.fromStack(stack);
-            wrapper.upgrades.setStackInSlot(
+            wrapper.getUpgrades().setStackInSlot(
                     0,
                     ModItems.TANKS_UPGRADE.get().getDefaultInstance()
             );

@@ -19,9 +19,9 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
-import net.p3pp3rf1y.sophisticatedbackpacks.api.CapabilityBackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlock;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlockEntity;
+import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.IBackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
 import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContainer;
@@ -130,16 +130,11 @@ public class SleepingBagUtils {
                          identifier,
                          backpackSlot
                         ) -> {
-                            return backpack.getCapability(CapabilityBackpackWrapper.getCapabilityInstance())
-                                    .map(
-                                            backpackWrapper -> {
-                                                var sleepingBag = getSleepingBag(backpackWrapper, simulate);
-                                                if (sleepingBag.isEmpty()) return false;
-                                                itemRef.set(sleepingBag);
-                                                return true;
-                                            }
-                                    )
-                                    .orElse(false);
+                            var wrapper = BackpackWrapper.fromStack(backpack);
+                            var sleepingBag = getSleepingBag(wrapper, simulate);
+                            if (sleepingBag.isEmpty()) return false;
+                            itemRef.set(sleepingBag);
+                            return true;
                         });
         return itemRef.get();
     }

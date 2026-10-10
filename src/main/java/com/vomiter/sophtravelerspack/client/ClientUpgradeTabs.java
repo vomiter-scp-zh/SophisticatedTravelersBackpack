@@ -1,6 +1,7 @@
 package com.vomiter.sophtravelerspack.client;
 
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 public final class ClientUpgradeTabs {
     private static final int FILTER_SLOTS_PER_ROW = 4;

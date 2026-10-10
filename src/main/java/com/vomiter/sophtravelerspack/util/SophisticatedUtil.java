@@ -6,6 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.p3pp3rf1y.sophisticatedbackpacks.api.CapabilityBackpackWrapper;
+import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.IBackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
 
@@ -40,12 +41,9 @@ public class SophisticatedUtil {
                          identifier,
                          backpackSlot
                         ) -> {
-                            return backpack.getCapability(CapabilityBackpackWrapper.getCapabilityInstance())
-                                    .map(
-                                            runnable::run
-                                    )
-                                    .orElse(false);
-
+                            var wrapper = BackpackWrapper.fromStack(backpack);
+                            runnable.run(wrapper);
+                            return true;
                         });
     }
 

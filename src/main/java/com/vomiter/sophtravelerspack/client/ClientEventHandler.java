@@ -19,8 +19,8 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -57,21 +57,23 @@ public class ClientEventHandler {
                     whenEquippedPresent = true;
                     BackpackAbilities.getBackpackEffects().entries().stream().filter((entry) -> entry.getKey() == stack.getItem()).forEach((entry) -> {
                         MutableComponent mutablecomponent = Component.literal("- ");
-                        mutablecomponent.append(Component.translatable(((BackpackEffect)entry.getValue()).effect().getDescriptionId()));
-                        MobEffect mobeffect = ((BackpackEffect)entry.getValue()).effect();
-                        if (((BackpackEffect)entry.getValue()).amplifier() > 0) {
-                            mutablecomponent = Component.translatable("potion.withAmplifier", new Object[]{mutablecomponent, Component.translatable("potion.potency." + ((BackpackEffect)entry.getValue()).amplifier())});
-                        }
+                        if (entry.getValue() != null) {
+                            mutablecomponent.append(Component.translatable(entry.getValue().effect().value().getDescriptionId()));
+                            MobEffect mobeffect = ((BackpackEffect)entry.getValue()).effect().value();
+                            if (((BackpackEffect)entry.getValue()).amplifier() > 0) {
+                                mutablecomponent = Component.translatable("potion.withAmplifier", new Object[]{mutablecomponent, Component.translatable("potion.potency." + ((BackpackEffect)entry.getValue()).amplifier())});
+                            }
 
-                        if (BackpackAbilities.getCooldowns().containsKey(stack.getItem())) {
-                            mutablecomponent.append(" " + TextUtils.getConvertedTime(((BackpackEffect)entry.getValue()).minDuration()));
-                        }
+                            if (BackpackAbilities.getCooldowns().containsKey(stack.getItem())) {
+                                mutablecomponent.append(" " + TextUtils.getConvertedTime(((BackpackEffect)entry.getValue()).minDuration()));
+                            }
 
-                        tooltipComponents.add(mutablecomponent.withStyle(mobeffect.getCategory().getTooltipFormatting()));
+                            tooltipComponents.add(mutablecomponent.withStyle(mobeffect.getCategory().getTooltipFormatting()));
+                        }
                     });
                 }
 
-                travelersBackpackItem.addAttributeModifierTooltip(stack, tooltipComponents, whenEquippedPresent);
+                //travelersBackpackItem.addAttributeModifierTooltip(stack, tooltipComponents, whenEquippedPresent);
                 if (BackpackAbilities.isOnList(BackpackAbilities.BLOCK_ABILITIES_LIST, stack) && BackpackAbilities.isOnList(BackpackAbilities.ITEM_ABILITIES_LIST, stack)) {
                     tooltipComponents.add(Component.translatable("ability.travelersbackpack.item_and_block"));
                 } else if (BackpackAbilities.isOnList(BackpackAbilities.BLOCK_ABILITIES_LIST, stack) && !BackpackAbilities.isOnList(BackpackAbilities.ITEM_ABILITIES_LIST, stack)) {
@@ -86,7 +88,7 @@ public class ClientEventHandler {
     }
 
 
-    public static void onClientTick(TickEvent.ClientTickEvent event){
+    public static void onClientTick(ClientTickEvent.Pre event){
         shouldInverseTank = false;
         var mc = Minecraft.getInstance();
         Player player = Minecraft.getInstance().player;

@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.animation.FrameSize;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceMetadata;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -103,7 +104,7 @@ public final class GeneratedSpriteUtil {
                     this.id,
                     new FrameSize(width, height),
                     result,
-                    AnimationMetadataSection.EMPTY
+                    ResourceMetadata.EMPTY
             ));
 
             return this;
@@ -360,7 +361,7 @@ public final class GeneratedSpriteUtil {
                     id,
                     new FrameSize(result.getWidth(), result.getHeight()),
                     result,
-                    AnimationMetadataSection.EMPTY
+                    ResourceMetadata.EMPTY
             );
 
             success = true;
