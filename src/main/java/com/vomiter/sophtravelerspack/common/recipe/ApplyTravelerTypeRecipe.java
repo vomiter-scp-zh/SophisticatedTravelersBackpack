@@ -68,7 +68,7 @@ public class ApplyTravelerTypeRecipe extends ShapelessRecipe {
                     return false;
                 }
 
-                travelerType = ModTravelerTypeRegistry.REGISTRY.get().getValues().stream().filter(
+                travelerType = ModTravelerTypeRegistry.REGISTRY.get().stream().filter(
                         travelerTypeInstance -> ItemStack.isSameItem(travelerTypeInstance.createTravelerBackpack(), stack)
                 ).findFirst().orElse(null);
 
@@ -106,7 +106,7 @@ public class ApplyTravelerTypeRecipe extends ShapelessRecipe {
                 sophisticatedBackpack = stack;
             } else if (stack.getItem() instanceof TravelersBackpackItem
                     && !stack.is(ModItems.STANDARD_TRAVELERS_BACKPACK.get())) {
-                travelerType = ModTravelerTypeRegistry.REGISTRY.get().getValues().stream().filter(
+                travelerType = ModTravelerTypeRegistry.REGISTRY.get().stream().filter(
                         travelerTypeInstance -> ItemStack.isSameItem(travelerTypeInstance.createTravelerBackpack(), stack)
                 ).findFirst().orElse(null);
             }
@@ -144,7 +144,7 @@ public class ApplyTravelerTypeRecipe extends ShapelessRecipe {
                 continue;
             }
 
-            TravelerTypeInstance type= ModTravelerTypeRegistry.REGISTRY.get().getValues().stream().filter(
+            TravelerTypeInstance type= ModTravelerTypeRegistry.REGISTRY.get().stream().filter(
                     travelerTypeInstance -> ItemStack.isSameItem(travelerTypeInstance.createTravelerBackpack(), stack)
             ).findFirst().orElse(null);
 

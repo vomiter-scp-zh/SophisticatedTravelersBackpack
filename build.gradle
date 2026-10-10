@@ -27,7 +27,13 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 apply from: 'gradle/neo-forge-runs.gradle'
 
+repositories {
+    maven { url = 'https://maven.blamejared.com' }
+}
+
 dependencies {
+    compileOnly "mezz.jei:jei-1.21.1-common-api:19.32.0.359"
+    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.32.0.359"
     implementation "curse.maven:sophisticated-backpacks-422301:8845926"
     implementation "curse.maven:sophisticated-core-618298:8838842"
     implementation "curse.maven:travelers-backpack-321117:8762814"

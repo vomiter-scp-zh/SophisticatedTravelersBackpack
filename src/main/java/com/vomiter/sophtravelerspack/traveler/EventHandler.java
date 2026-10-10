@@ -14,7 +14,9 @@ public class EventHandler {
     public static void playerTick(final PlayerTickEvent.Post event) {
         if(!TravelerUtil.getShadow(event.getEntity()).isEmpty()) {
             BackpackWrapper.tick(TravelerUtil.getShadow(event.getEntity()), event.getEntity(), true);
-            TravelerUtil.saveShadow(event.getEntity());
+            if (!event.getEntity().level().isClientSide) {
+                TravelerUtil.saveShadow(event.getEntity());
+            }
         }
 
     }

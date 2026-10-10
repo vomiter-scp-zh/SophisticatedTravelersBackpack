@@ -1,12 +1,12 @@
 package com.vomiter.sophtravelerspack.common.registry;
 
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegisterEvent;
+import net.minecraft.core.registries.Registries;
+import net.neoforged.neoforge.registries.RegisterEvent;
 
 public final class ModUpgradeContainers {
 
     public static void register(RegisterEvent event) {
-        if (!event.getRegistryKey().equals(ForgeRegistries.Keys.MENU_TYPES)) {
+        if (!event.getRegistryKey().equals(Registries.MENU)) {
             return;
         }
     }

@@ -1,13 +1,11 @@
 package com.vomiter.sophtravelerspack.mixin.model;
 
 import com.mojang.datafixers.util.Either;
-import com.vomiter.sophtravelerspack.STBackpack;
 import com.vomiter.sophtravelerspack.client.BakedSTBackpackModels;
 import com.vomiter.sophtravelerspack.traveler.TravelerType;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
@@ -24,7 +22,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -39,21 +36,7 @@ public abstract class BackpackDynamicModelMixin {
         Map<String, Either<Material, String>> resolvedTextures = new HashMap<>();
 
         if (context.hasMaterial("clips")) {
-            ResourceLocation clipTexture = context.getMaterial("clips").texture();
-            String clipPath = clipTexture.getPath();
-            String clipFileName = clipPath.substring(clipPath.lastIndexOf('/') + 1);
-
-            ResourceLocation textureLocation = STBackpack.modLoc(
-                    "block/"
-                            + travelerType.name().toLowerCase(Locale.ROOT)
-                            + "/"
-                            + clipFileName
-            );
-
-            resolvedTextures.put(
-                    "clips",
-                    Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, textureLocation))
-            );
+            resolvedTextures.put("clips", Either.left(context.getMaterial("clips")));
         }
 
         return new BlockModel(

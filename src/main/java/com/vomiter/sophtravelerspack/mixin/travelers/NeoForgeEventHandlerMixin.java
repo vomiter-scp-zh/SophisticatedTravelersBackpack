@@ -3,6 +3,8 @@ package com.vomiter.sophtravelerspack.mixin.travelers;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.tiviacz.travelersbackpack.handlers.NeoForgeEventHandler;
+import com.tiviacz.travelersbackpack.capability.AttachmentUtils;
+import com.tiviacz.travelersbackpack.inventory.BackpackWrapper;
 import com.vomiter.sophtravelerspack.traveler.TravelerUtil;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -41,5 +43,17 @@ public class NeoForgeEventHandlerMixin {
         return originalStack.isEmpty()
                 ? TravelerUtil.getShadow(player)
                 : originalStack;
+    }
+    @WrapOperation(
+            method = "playerTick",
+            at = @At(value = "INVOKE", target =
+                    "Lcom/tiviacz/travelersbackpack/inventory/BackpackWrapper;tick(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/player/Player;Z)V")
+    )
+    private static void stbp$avoidDuplicateShadowTick(
+            ItemStack stack, Player player, boolean integration, Operation<Void> original) {
+        // EventHandler owns the shadow's integration tick and subsequent component writeback.
+        if (AttachmentUtils.isWearingBackpack(player)) {
+            original.call(stack, player, integration);
+        }
     }
 }

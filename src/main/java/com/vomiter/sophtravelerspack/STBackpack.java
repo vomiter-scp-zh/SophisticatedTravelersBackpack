@@ -10,17 +10,16 @@ import com.vomiter.sophtravelerspack.common.registry.*;
 import com.vomiter.sophtravelerspack.network.ModNetwork;
 import com.vomiter.sophtravelerspack.traveler.EventHandler;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
 import org.slf4j.Logger;
 
-// The value here should match an entry in the META-INF/mods.toml file
+// The value here should match the mod ID in META-INF/neoforge.mods.toml
 @Mod(STBackpack.MODID)
 public class STBackpack {
 
@@ -28,12 +27,11 @@ public class STBackpack {
     public static final String MODID = "sophtravelerspack";
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static ResourceLocation modLoc(String path){return ResourceLocation.fromNamespaceAndPath(MODID, path);};
+    public static ResourceLocation modLoc(String path){return ResourceLocation.fromNamespaceAndPath(MODID, path);}
 
-    public STBackpack() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public STBackpack(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         ModTravelerTypeRegistry.register(modEventBus);
         ModDataComponents.register(modEventBus);
         ModRecipeSerializers.register(modEventBus);
@@ -41,17 +39,19 @@ public class STBackpack {
         ModTabs.TABS.register(modEventBus);
         modEventBus.addListener(ModUpgradeContainers::register);
         modEventBus.addListener(ModNetwork::registerPayloads);
-        MinecraftForge.EVENT_BUS.addListener(STBPCommand::register);
-        MinecraftForge.EVENT_BUS.addListener(SleepingBagCommand::register);
+        NeoForge.EVENT_BUS.addListener(STBPCommand::register);
+        NeoForge.EVENT_BUS.addListener(SleepingBagCommand::register);
         EventHandler.init();
 
         if (FMLEnvironment.dist.isClient()){
             modEventBus.addListener(ClientUpgradeTabs::onClientSetup);
-            MinecraftForge.EVENT_BUS.addListener(ClientEventHandler::onClientTick);
-            MinecraftForge.EVENT_BUS.addListener(ClientEventHandler::onItemTooltip);
-            MinecraftForge.EVENT_BUS.addListener(SleepingBagScreenButton::onInit);
-            MinecraftForge.EVENT_BUS.addListener(SleepingBagScreenButton::onRenderPre);
-            MinecraftForge.EVENT_BUS.addListener(SleepingBagScreenButton::onRenderPost);
+            modEventBus.addListener(ClientEventHandler::onRegisterAdditionalModels);
+            modEventBus.addListener(ClientEventHandler::onBakingCompleted);
+            NeoForge.EVENT_BUS.addListener(ClientEventHandler::onClientTick);
+            NeoForge.EVENT_BUS.addListener(ClientEventHandler::onItemTooltip);
+            NeoForge.EVENT_BUS.addListener(SleepingBagScreenButton::onInit);
+            NeoForge.EVENT_BUS.addListener(SleepingBagScreenButton::onRenderPre);
+            NeoForge.EVENT_BUS.addListener(SleepingBagScreenButton::onRenderPost);
         }
     }
 

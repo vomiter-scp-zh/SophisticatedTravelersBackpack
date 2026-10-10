@@ -11,6 +11,8 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -158,20 +160,19 @@ public abstract class BackpackBakedModelMixin implements BackpackModelsExtension
     pass camouflage model property into model data
     in this method, the backpack item is still accessible from the block entity
      */
-    @Inject(method = "lambda$getModelData$4", at = @At(value = "RETURN"), cancellable = true, remap = false)
-    private static void stbp$getModel(
+    @Inject(method = "getModelData", at = @At("RETURN"), cancellable = true, remap = false)
+    private void stbp$getModel(
+            BlockAndTintGetter level,
+            BlockPos pos,
+            BlockState state,
             ModelData modelData,
-            BackpackBlockEntity backpackBlockEntity,
-            CallbackInfoReturnable<ModelData> cir){
+            CallbackInfoReturnable<ModelData> cir) {
+        if (!(level.getBlockEntity(pos) instanceof BackpackBlockEntity backpackBlockEntity)) return;
         ItemStack itemStack = backpackBlockEntity.getBackpackWrapper().getBackpack();
         TravelerTypeInstance travelerType = TravelerType.getTravelerTypeFromBackpack(itemStack);
-        if(travelerType == null) return;
-        cir.setReturnValue(
-                cir.getReturnValue()
-                        .derive()
-                        .with(stbp$camouflageProperty, travelerType)
-                        .build()
-        );
+        if (travelerType == null) return;
+        cir.setReturnValue(cir.getReturnValue().derive()
+                .with(stbp$camouflageProperty, travelerType).build());
     }
 
     /*

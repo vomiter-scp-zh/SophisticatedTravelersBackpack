@@ -12,6 +12,9 @@ import com.tiviacz.travelersbackpack.util.TextUtils;
 import com.vomiter.sophtravelerspack.traveler.TravelerUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import com.vomiter.sophtravelerspack.traveler.TravelerType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
@@ -26,6 +29,18 @@ import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ClientEventHandler {
+    public static void onRegisterAdditionalModels(ModelEvent.RegisterAdditional event) {
+        for (TravelerType type : TravelerType.values()) {
+            for (BakedSTBackpackModels.ModelPart part : BakedSTBackpackModels.ModelPart.values()) {
+                event.register(ModelResourceLocation.standalone(BakedSTBackpackModels.getLoc(type, part)));
+            }
+        }
+    }
+
+    public static void onBakingCompleted(ModelEvent.BakingCompleted event) {
+        BakedSTBackpackModels.clearTravelerExtras();
+    }
+
     public static boolean shouldInverseTank = false;
 
     public static void onItemTooltip(ItemTooltipEvent event) {

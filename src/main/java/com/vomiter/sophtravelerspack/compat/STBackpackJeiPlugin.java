@@ -48,7 +48,7 @@ public class STBackpackJeiPlugin implements IModPlugin {
             }
 
             for (TravelerTypeInstance type :
-                    ModTravelerTypeRegistry.REGISTRY.get().getValues()) {
+                    ModTravelerTypeRegistry.REGISTRY.get()) {
                 ItemStack sophisticated = item.getDefaultInstance();
                 ItemStack specialTraveler = type.createTravelerBackpack();
                 ItemStack standardTraveler =

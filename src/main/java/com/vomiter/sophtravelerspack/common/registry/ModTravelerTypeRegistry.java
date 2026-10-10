@@ -6,11 +6,9 @@ import com.vomiter.sophtravelerspack.traveler.TravelerTypeInstance;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -31,16 +29,18 @@ public final class ModTravelerTypeRegistry {
                     STBackpack.MODID
             );
 
-    public static final Supplier<IForgeRegistry<TravelerTypeInstance>> REGISTRY =
-            DEFERRED_REGISTER.makeRegistry(RegistryBuilder::new);
+    private static final Registry<TravelerTypeInstance> TRAVELER_TYPES =
+            DEFERRED_REGISTER.makeRegistry(builder -> builder.sync(true));
 
-    private static final EnumMap<TravelerType, RegistryObject<TravelerTypeInstance>> MUTABLE_ENTRIES = new EnumMap<>(TravelerType.class);
+    public static final Supplier<Registry<TravelerTypeInstance>> REGISTRY = () -> TRAVELER_TYPES;
 
-    public static final Map<TravelerType, RegistryObject<TravelerTypeInstance>> ENTRIES;
+    private static final EnumMap<TravelerType, DeferredHolder<TravelerTypeInstance, TravelerTypeInstance>> MUTABLE_ENTRIES = new EnumMap<>(TravelerType.class);
+
+    public static final Map<TravelerType, DeferredHolder<TravelerTypeInstance, TravelerTypeInstance>> ENTRIES;
 
     static {
         for (TravelerType travelerType : TravelerType.values()) {
-            RegistryObject<TravelerTypeInstance> registryObject =
+            DeferredHolder<TravelerTypeInstance, TravelerTypeInstance> registryObject =
                     DEFERRED_REGISTER.register(
                             travelerType.getStringRepresentation(),
                             () -> new TravelerTypeInstance(
@@ -65,10 +65,10 @@ public final class ModTravelerTypeRegistry {
         DEFERRED_REGISTER.register(modBus);
     }
 
-    public static RegistryObject<TravelerTypeInstance> getRegistryObject(
+    public static DeferredHolder<TravelerTypeInstance, TravelerTypeInstance> getRegistryObject(
             TravelerType travelerType
     ) {
-        RegistryObject<TravelerTypeInstance> registryObject =
+        DeferredHolder<TravelerTypeInstance, TravelerTypeInstance> registryObject =
                 MUTABLE_ENTRIES.get(travelerType);
 
         if (registryObject == null) {
@@ -85,15 +85,13 @@ public final class ModTravelerTypeRegistry {
     }
 
     public static Optional<TravelerTypeInstance> get(ResourceLocation id) {
-        return Optional.ofNullable(REGISTRY.get().getValue(id));
+        return Optional.ofNullable(REGISTRY.get().get(id));
     }
 
     public static Optional<TravelerTypeInstance> findByStringRepresentation(
             String representation
     ) {
-        return REGISTRY.get()
-                .getValues()
-                .stream()
+        return REGISTRY.get().stream()
                 .filter(instance ->
                         instance.getStringRepresentation().equals(representation)
                 )

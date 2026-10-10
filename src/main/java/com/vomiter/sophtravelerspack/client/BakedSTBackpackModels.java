@@ -41,6 +41,12 @@ public class BakedSTBackpackModels {
     private static final Map<Block, BakedModel> BAKED_TRAVELER_EXTRA_MODELS = new HashMap<>();
     private static final Map<Block, BakedModel> BAKED_TRAVELER_TANK_MODELS = new HashMap<>();
 
+    public static void clearTravelerExtras() {
+        CACHED_TRAVELERS.clear();
+        BAKED_TRAVELER_EXTRA_MODELS.clear();
+        BAKED_TRAVELER_TANK_MODELS.clear();
+    }
+
     public static void putExtraModel(Block key, BakedModel model){
         BAKED_TRAVELER_EXTRA_MODELS.put(key, model);
     }

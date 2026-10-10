@@ -2,8 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.vomiter.sophtravelerspack.mixin",
-  "compatibilityLevel": "JAVA_8",
-  "refmap": "sophtravelerspack.mixins.refmap.json",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "SophBackpackBlockMixin",
     "SophBackpackFluidHandlerAccessor",

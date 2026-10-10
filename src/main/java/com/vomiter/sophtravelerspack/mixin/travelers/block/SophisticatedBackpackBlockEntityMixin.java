@@ -31,7 +31,7 @@ public class SophisticatedBackpackBlockEntityMixin {
         if(!isCactus) return;
         if (mixin.stbp$cactusCounter >= 1000 && backpackBlockEntity.getBackpackWrapper().getFluidHandler().isPresent()){
             var fluidHandler = backpackBlockEntity.getBackpackWrapper().getFluidHandler().get();
-            var result = fluidHandler.fill(new FluidStack(Fluids.WATER, 1000), OIFluidHandler.FluidAction.EXECUTE);
+            var result = fluidHandler.fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
             if(result > 0){
                 mixin.stbp$cactusCounter = 0;
             }

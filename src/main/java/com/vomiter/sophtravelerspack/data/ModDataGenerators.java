@@ -1,13 +1,13 @@
 package com.vomiter.sophtravelerspack.data;
 
 import com.vomiter.sophtravelerspack.STBackpack;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 
-@Mod.EventBusSubscriber(
+@EventBusSubscriber(
         modid = STBackpack.MODID,
-        bus = Mod.EventBusSubscriber.Bus.MOD
+        bus = EventBusSubscriber.Bus.MOD
 )
 public final class ModDataGenerators {
     private ModDataGenerators() {

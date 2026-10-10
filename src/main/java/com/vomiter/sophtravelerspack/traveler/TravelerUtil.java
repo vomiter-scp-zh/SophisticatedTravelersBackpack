@@ -116,8 +116,14 @@ public final class TravelerUtil {
             if (upgrade == null) return;
             FluidTank leftTank = upgrade.getLeftTank();
             FluidTank rightTank = upgrade.getRightTank();
-            fluidHandler.fill(leftTank.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
-            fluidHandler.fill(rightTank.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+            int leftAccepted = fluidHandler.fill(leftTank.getFluid().copy(), IFluidHandler.FluidAction.SIMULATE);
+            if (leftAccepted > 0) {
+                fluidHandler.fill(leftTank.drain(leftAccepted, IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+            }
+            int rightAccepted = fluidHandler.fill(rightTank.getFluid().copy(), IFluidHandler.FluidAction.SIMULATE);
+            if (rightAccepted > 0) {
+                fluidHandler.fill(rightTank.drain(rightAccepted, IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+            }
         });
         // Persist after tank transfer so the snapshot contains the resulting state.
         setShadow(sophisticatedBackpack, travelerShadow);
