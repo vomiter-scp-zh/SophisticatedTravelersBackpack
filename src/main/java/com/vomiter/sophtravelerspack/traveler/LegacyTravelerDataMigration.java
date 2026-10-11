@@ -109,15 +109,7 @@ public final class LegacyTravelerDataMigration {
         if (saved.isEmpty()) return Optional.of(ItemStack.EMPTY);
         CompoundTag converted = saved.copy();
         try {
-            if (converted.contains("Count", Tag.TAG_ANY_NUMERIC) && !converted.contains("count")) {
-                // Vanilla does not traverse arbitrary mod-owned tags inside CUSTOM_DATA.
-                // Run its item-stack fixer explicitly for the nested 1.20.1 stack.
-                Dynamic<Tag> fixed = DataFixers.getDataFixer().update(References.ITEM_STACK,
-                        new Dynamic<>(NbtOps.INSTANCE, converted), DATA_VERSION_1_20_1,
-                        SharedConstants.getCurrentVersion().getDataVersion().getVersion());
-                if (!(fixed.getValue() instanceof CompoundTag compound)) return Optional.empty();
-                converted = compound;
-            }
+            converted = upgradeLegacyItemStack(converted);
             Optional<ItemStack> result = ItemStack.parse(registries, converted);
             result.ifPresent(LegacyTravelerDataMigration::migrateShadowState);
             return result;
@@ -125,6 +117,21 @@ public final class LegacyTravelerDataMigration {
             LOGGER.debug("Cannot migrate legacy STBP shadow; keeping its original NBT", exception);
             return Optional.empty();
         }
+    }
+
+    /** Both block backpackData and the nested shadow are outside vanilla's known item-stack paths. */
+    public static CompoundTag upgradeLegacyItemStack(CompoundTag saved) {
+        CompoundTag converted = saved.copy();
+        if (!converted.contains("Count", Tag.TAG_ANY_NUMERIC) || converted.contains("count")) {
+            return converted;
+        }
+        Dynamic<Tag> fixed = DataFixers.getDataFixer().update(References.ITEM_STACK,
+                new Dynamic<>(NbtOps.INSTANCE, converted), DATA_VERSION_1_20_1,
+                SharedConstants.getCurrentVersion().getDataVersion().getVersion());
+        if (!(fixed.getValue() instanceof CompoundTag compound)) {
+            throw new IllegalStateException("Legacy backpack item-stack fixer did not return a compound");
+        }
+        return compound;
     }
 
     private static void migrateShadowState(ItemStack shadow) {

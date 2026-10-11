@@ -3,6 +3,11 @@ package com.vomiter.sophtravelerspack.mixin.travelers.block;
 import com.vomiter.sophtravelerspack.STBackpack;
 import com.vomiter.sophtravelerspack.common.registry.ModTravelerTypeRegistry;
 import com.vomiter.sophtravelerspack.traveler.TravelerType;
+import com.vomiter.sophtravelerspack.traveler.LegacyTravelerDataMigration;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
 import com.vomiter.sophtravelerspack.traveler.TravelerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -15,9 +20,25 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = BackpackBlockEntity.class, remap = false)
 public class SophisticatedBackpackBlockEntityMixin {
+    @Inject(method = "getBackpackFromNbt", at = @At("HEAD"), cancellable = true)
+    private void stbp$loadLegacyBackpack(CompoundTag nbt, HolderLookup.Provider registries,
+            CallbackInfoReturnable<ItemStack> cir) {
+        CompoundTag saved = nbt.getCompound(BackpackBlockEntity.BACKPACK_DATA_TAG);
+        if (!saved.contains("Count", Tag.TAG_ANY_NUMERIC) || saved.contains("count")) return;
+
+        // The mod-owned backpackData field was not traversed by vanilla's chunk data fixer.
+        // Upgrade the whole stack before the 1.21.1 parser looks for count/components.
+        CompoundTag converted = LegacyTravelerDataMigration.upgradeLegacyItemStack(saved);
+        ItemStack backpack = ItemStack.parse(registries, converted).orElseThrow(() ->
+                new IllegalStateException("Cannot decode legacy backpackData; refusing to replace it with an empty stack"));
+        LegacyTravelerDataMigration.migrate(backpack, registries);
+        cir.setReturnValue(backpack);
+    }
+
     @Unique
     int  stbp$cactusCounter = 0;
 
